@@ -1,0 +1,14 @@
+
+‚
+java:S1192¡"_Define a constant instead of duplicating this literal "Fallback: S3 service exception" 4 times.(Êı­ÿÿÿÿÿ8Â•ÃÊ÷2
+u
+java:S6244g"SConsider using the Consumer Builder method instead of creating this nested builder.(·Â¨ºÿÿÿÿÿ8òÉ÷2
+]	java:S125~"<This block of commented-out lines of code should be removed.(ı­ê‹üÿÿÿÿ8’òÉ÷2
+f
+java:S1172 "HRemove these unused method parameters "file", "fileType", "accessScope".(œ¾¸8–òÉ÷2
+X
+java:S1172¥"5Remove this unused method parameter "fileManagement".(ÓÅĞîûÿÿÿÿ8˜òÉ÷2
+f
+java:S1172ª"CRemove these unused method parameters "fileManagement", "newLevel".(›Õ¡ûÿÿÿÿ8™òÉ÷2
+X
+java:S1172¯"5Remove this unused method parameter "fileManagement".(ı½ŠÜüÿÿÿÿ8šòÉ÷2

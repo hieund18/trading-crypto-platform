@@ -1,0 +1,25 @@
+package com.hieu.profile_service.dto.request;
+
+import com.hieu.profile_service.validator.DobConstraint;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+
+import java.time.LocalDate;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class ProfileUpdateRequest {
+    @NotBlank(message = "FULL_NAME_IS_REQUIRED")
+    String fullName;
+
+    @NotNull(message = "DOB_IS_REQUIRED")
+    @DobConstraint(min = 18, message = "INVALID_DOB")
+    LocalDate dob;
+
+    String address;
+}

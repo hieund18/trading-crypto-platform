@@ -1,0 +1,15 @@
+version: "3"
+name: hieu
+services:
+  redis:
+    image: redis:8.0
+    container_name: redis
+    hostname: redis
+    ports:
+      - "6379:6379"
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: redisinsight
+    hostname: redisinsight
+    ports:
+      - "5540:5540"

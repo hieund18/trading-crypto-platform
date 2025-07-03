@@ -1,0 +1,85 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /identity
+spring:
+  application:
+    name: identity-service
+  datasource:
+    url: ${DBMS_CONNECTION:jdbc:mysql://localhost:3306/identity_service1}
+    username: ${DBMS_USERNAME:root}
+    password: ${DBMS_PASSWORD:root}
+    driver-class-name: "com.mysql.cj.jdbc.Driver"
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+
+jwt:
+  signer-key: ${JWT_SIGNERKEY:/6zEjpNXnIJ1lAaprHIr/W6f+PAzLq+1etCA0+4Qt0vBb8bvj7PR0L27F/wT5WYj}
+  validation-duration: 3600 # in seconds
+  refreshable-duration: 36000 # in seconds
+  reset-duration: 300 # in seconds
+
+app:
+  services:
+    otp: http://localhost:8081/otp
+    profile: http://localhost:8083/profile
+  scheduler:
+    delete-unverified-users-cron: "0 0 3 * * *"
+
+outbound:
+  identity:
+    redirect-uri: http://localhost:3000/authenticate
+    google:
+      token-uri: https://oauth2.googleapis.com
+      client-id: 1001432421262-1ro1pga3am9iq5s1q2s0812o6v9it8q7.apps.googleusercontent.com
+      client-secret: ${OUTBOUND_GOOGLE_CLIENTSECRET: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}
+      api-url: https://www.googleapis.com
+    github:
+      token-uri: https://github.com/login/oauth
+      client-id: Ov23liX1I1QsxdcWaYiM
+      client-secret: ${OUTBOUND_GITHUB_CLIENTSECRET:b88fc45e1be8b1f9a94677a7c1bbdc887e446195}
+      api-url: https://api.github.com
+
+resilience4j:
+  retry:
+    retry-aspect-order: 2
+    configs:
+      default:
+        max-attempts: 3
+        wait-duration: 500ms
+        ignore-exceptions:
+          - com.hieu.identity_service.exception.AppException
+    instances:
+      profileService:
+        base-config: default
+      otpService:
+        base-config: default
+
+  circuitbreaker:
+    circuit-breaker-aspect-order: 1
+    configs:
+      default:
+        register-health-indicator: true
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 3
+        minimum-number-of-calls: 5
+        ignore-exceptions:
+          - com.hieu.identity_service.exception.AppException
+    instances:
+      profileService:
+        base-config: default
+      otpService:
+        base-config: default
+
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: "*"
+#  endpoint:
+#    health:
+#      show-details: always

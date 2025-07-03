@@ -1,0 +1,21 @@
+
+X	java:S125"<This block of commented-out lines of code should be removed.(Ç×˜ˆ8Ø…Âê÷2
+d
+java:S1128"BRemove this unused import 'com.hieu.file_service.dto.ApiResponse'.(ÜÚŒ˜øÿÿÿÿ8´ìÁê÷2
+c
+java:S1128"FRemove this unused import 'com.hieu.file_service.service.FileService'.(ö×˜Ê8Ø…Âê÷2
+L
+java:S1128"/Remove this unused import 'lombok.AccessLevel'.(ˆ¥ó¹8Ù…Âê÷2
+]
+java:S1128";Remove this unused import 'lombok.RequiredArgsConstructor'.(ÑØúøÿÿÿÿ8Ù…Âê÷2
+[
+java:S1128">Remove this unused import 'lombok.experimental.FieldDefaults'.(õÂÀ½8Ù…Âê÷2
+t
+java:S1128"RRemove this unused import 'org.springframework.web.bind.annotation.DeleteMapping'.(­ìÎªşÿÿÿÿ8´ìÁê÷2
+s
+java:S1128	"QRemove this unused import 'org.springframework.web.bind.annotation.PathVariable'.(¹ûñÅşÿÿÿÿ8´ìÁê÷2
+p
+java:S1128
+"SRemove this unused import 'org.springframework.web.bind.annotation.RequestMapping'.(ö»¿ë8Ù…Âê÷2
+u
+java:S1128"SRemove this unused import 'org.springframework.web.bind.annotation.RestController'.(±íş¡şÿÿÿÿ8Ù…Âê÷2

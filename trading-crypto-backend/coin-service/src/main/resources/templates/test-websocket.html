@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js"></script>
+</head>
+<body>
+<script>
+    var socket = new SockJS('http://localhost:8888/api/v1/coin/ws');
+    var stompClient = Stomp.over(socket);
+
+    stompClient.connect({}, function(frame) {
+        console.log('Connected: ' + frame);
+<!--        stompClient.subscribe('/topic/coins', function(message) {-->
+<!--            console.log("Received: ", message.body);-->
+<!--        });-->
+        stompClient.subscribe('/topic/coin/bitcoin', function(message) {
+            console.log("Received: ", message.body);
+        });
+    });
+  </script>
+</body>
+</html>

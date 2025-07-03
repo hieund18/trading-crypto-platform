@@ -1,0 +1,68 @@
+server:
+  port: 8084
+  servlet:
+    context-path: /file
+spring:
+  application:
+    name: file-service
+  data:
+    mongodb:
+      uri: mongodb://root:root@localhost:27017/file_service?authSource=admin
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 10MB
+
+app:
+  file:
+    storage-dir: /uploads
+    download-prefix: http://localhost:8888/api/v1/file/media/download/
+
+cloud:
+  aws:
+    credentials:
+      access-key: ${AWS_ACCESS_KEY:AKIA33FMH3SQYRWEPWFU}
+      secret-key: ${AWS_SECRET_KEY}
+    region:
+      static: ${AWS_REGION:ap-southeast-1}
+    s3:
+      bucket: ${AWS_S3_BUCKET:trading.crypto.app}
+      public-dir: public/
+      private-dir: private/
+
+resilience4j:
+  retry:
+    retry-aspect-order: 2
+    configs:
+      default:
+        maxAttempts: 3
+        waitDuration: 500ms
+        retry-exceptions:
+          - java.net.SocketTimeoutException
+          - software.amazon.awssdk.core.exception.SdkClientException
+        ignore-exceptions:
+    instances:
+      awsS3Service:
+        base-config: default
+
+  circuitbreaker:
+    circuit-breaker-aspect-order: 1
+    configs:
+      default:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 3
+        permitted-number-of-calls-in-half-open-state: 3
+        minimum-number-of-calls: 5
+    instances:
+      awsS3Service:
+        base-config: default
+
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: "*"
+#  endpoint:
+#    health:
+#      show-details: always

@@ -1,0 +1,11 @@
+
+7
+java:S1220""Move this file to a named package.8‚δής2
+X	java:S125	"<This block of commented-out lines of code should be removed.(άΰθ8Ά‚δής2
+X	java:S125"<This block of commented-out lines of code should be removed.(ΰΆ®8Ά‚δής2
+L
+java:S1128"/Remove this unused import 'lombok.AccessLevel'.(¥σΉ8£‚δής2
+G
+java:S1128"*Remove this unused import 'lombok.Getter'.(ωÒµΩ8£‚δής2
+[
+java:S1128">Remove this unused import 'lombok.experimental.FieldDefaults'.(υΒΐ½8£‚δής2

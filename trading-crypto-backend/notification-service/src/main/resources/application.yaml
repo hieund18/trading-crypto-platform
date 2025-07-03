@@ -1,0 +1,50 @@
+server:
+  port: 8082
+  servlet:
+    context-path: /notification
+spring:
+  application:
+    name: notification-service
+  data:
+    mongodb:
+      uri: mongodb://root:root@localhost:27017/notification_service?authSource=admin
+  kafka:
+    bootstrap-servers: localhost:9094
+    consumer:
+      group-id: notification-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+
+notification:
+  email:
+    sendgrid:
+      url: https://api.sendgrid.com
+      apikey: ${OUTBOUND_SENDGRID_APIKEY}
+    sender:
+      email: hieund.work@proton.me
+      name: BitStorm
+
+resilience4j:
+  retry:
+    configs:
+      default:
+        max-attempts: 3
+        wait-duration: 10
+#        retry-exceptions:
+#          - java.net.SocketTimeoutException
+#          - org.springframework.web.client.HttpClientErrorException$TooManyRequests
+    instances:
+      emailService:
+        base-config: default
+
+  circuitbreaker:
+    configs:
+      default:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 3
+        minimum-number-of-calls: 5

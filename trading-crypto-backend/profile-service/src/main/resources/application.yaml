@@ -1,0 +1,58 @@
+server:
+  port: 8083
+  servlet:
+    context-path: /profile
+spring:
+  application:
+    name: profile-service
+  data:
+    mongodb:
+      uri: mongodb://root:root@localhost:27017/profile_service?authSource=admin
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 10MB
+
+app:
+  services:
+    file: http://localhost:8084/file
+  default-avatar:
+    url: ${DEFAULT_AVATAR_URL:https://s3.ap-southeast-1.amazonaws.com/trading.crypto.app/system/default-avatar.jpg}
+    key: ${DEFAULT_AVATAR_KEY:system/default-avatar.jpg}
+
+resilience4j:
+  retry:
+    retry-aspect-order: 2
+    configs:
+      default:
+        max-attempts: 3
+        wait-duration: 500ms
+        ignore-exceptions:
+          - com.hieu.profile_service.exception.AppException
+    instances:
+      fileService:
+        base-config: default
+
+  circuitbreaker:
+    circuit-breaker-aspect-order: 1
+    configs:
+      default:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 3
+        minimum-number-of-calls: 5
+        ignore-exceptions:
+          - com.hieu.profile_service.exception.AppException
+    instances:
+      fileService:
+        base-config: default
+
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: "*"
+#  endpoint:
+#    health:
+#      show-details: always
