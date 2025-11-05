@@ -43,3 +43,9 @@ spring:
 #        - Path=${app.api-prefix}/coin/ws/**
 #        filters:
 #        - StripPrefix=2
+      - id: wallet_service
+        uri: http://localhost:8086
+        predicates:
+        - Path=${app.api-prefix}/wallet/wallets/**
+        filters:
+        - StripPrefix=2

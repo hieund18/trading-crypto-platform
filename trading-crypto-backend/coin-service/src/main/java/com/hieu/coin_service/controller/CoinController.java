@@ -71,4 +71,22 @@ public class CoinController {
                 .result(coinService.getCoin(id))
                 .build();
     }
+
+    @GetMapping("/markets/search")
+    ApiResponse<PageResponse<CoinResponse>> searchCoins(
+        @RequestParam(required = false, defaultValue = "") String keyword,
+        @RequestParam(required = false, defaultValue = "true") Boolean isActive,
+        @PageableDefault(page = 1, sort = "marketCapRank", direction = Sort.Direction.ASC) Pageable pageable
+    ){
+        return ApiResponse.<PageResponse<CoinResponse>>builder()
+                .result(coinService.searchCoins(pageable, isActive, keyword))
+                .build();
+    }
+
+    @PatchMapping("/markets/{id}")
+    ApiResponse<CoinResponse> updateCoinStatus(@PathVariable String id) {
+        return ApiResponse.<CoinResponse>builder()
+                .result(coinService.updateCoinStatus(id))
+                .build();
+    }
 }

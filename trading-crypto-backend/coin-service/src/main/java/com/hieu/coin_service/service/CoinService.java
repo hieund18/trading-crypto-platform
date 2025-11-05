@@ -6,6 +6,7 @@ import com.hieu.coin_service.dto.PageResponse;
 import com.hieu.coin_service.dto.request.AddCoinRequest;
 import com.hieu.coin_service.dto.response.CoinGeckoMarketDataResponse;
 import com.hieu.coin_service.dto.response.CoinResponse;
+import com.hieu.coin_service.dto.response.CoinUpdateResponse;
 import com.hieu.coin_service.entity.Coin;
 import com.hieu.coin_service.exception.AppException;
 import com.hieu.coin_service.exception.ErrorCode;
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -72,9 +74,12 @@ public class CoinService {
     public PageResponse<CoinResponse> getAllCoins(Pageable pageable) {
         String key = RedisKeyUtil.pageCoins(pageable);
         Object value = redisTemplate.opsForValue().get(key);
-        PageResponse<CoinResponse> cached = objectMapper.convertValue(value, new TypeReference<PageResponse<CoinResponse>>() {});
-        if(cached != null)
+        PageResponse<CoinResponse> cached = objectMapper.convertValue(value, new TypeReference<PageResponse<CoinResponse>>() {
+        });
+        if (cached != null) {
+            log.info("coin info: {}", cached);
             return cached;
+        }
 
         Pageable pageRequest = PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize(), pageable.getSort());
 
@@ -97,8 +102,9 @@ public class CoinService {
     public List<CoinResponse> getTrendingCoins() {
         String key = RedisKeyUtil.trendingCoins();
         Object value = redisTemplate.opsForValue().get(key);
-        List<CoinResponse> cached = objectMapper.convertValue(value, new TypeReference<List<CoinResponse>>() {});
-        if(cached != null)
+        List<CoinResponse> cached = objectMapper.convertValue(value, new TypeReference<List<CoinResponse>>() {
+        });
+        if (cached != null)
             return cached;
 
         var trendingResponse = coinGeckoService.getTrendingCoin();
@@ -128,9 +134,10 @@ public class CoinService {
         String key = RedisKeyUtil.coinInfo(id);
         Object value = redisTemplate.opsForValue().get(key);
         CoinResponse cacheCoin = objectMapper.convertValue(value, CoinResponse.class);
+
         if (Objects.nonNull(cacheCoin))
             return cacheCoin;
-
+        log.info("Coin: {}", cacheCoin);
         Coin coin = coinRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.COIN_NOT_EXISTED));
 
@@ -143,8 +150,33 @@ public class CoinService {
         return coinResponse;
     }
 
-    @Scheduled(fixedRate = 10000)
-    public void syncCoin(){
+    public PageResponse<CoinResponse> searchCoins(Pageable pageable, Boolean isActive, String keyword){
+        Pageable pageRequest = PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize(), pageable.getSort());
+        Page<Coin> coinPage = coinRepository.findByNameContainingIgnoreCaseAndIsActive(keyword, isActive, pageRequest);
+
+        PageResponse<CoinResponse> pageResponse = PageResponse.<CoinResponse>builder()
+                .currentPage(pageable.getPageNumber())
+                .totalPages(coinPage.getTotalPages())
+                .sizePage(pageable.getPageSize())
+                .totalElements(coinPage.getTotalElements())
+                .content(coinPage.getContent().stream().map(coinMapper::toCoinResponse).toList())
+                .build();
+
+        return pageResponse;
+    }
+
+    public CoinResponse updateCoinStatus(String id) {
+        Coin coin = coinRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.COIN_NOT_EXISTED));
+
+        coin.setIsActive(!coin.getIsActive());
+        coinRepository.save(coin);
+
+        return coinMapper.toCoinResponse(coin);
+    }
+
+    @Scheduled(fixedRate = 60000)
+    public void syncCoin() {
         List<Coin> coins = coinRepository.findAll();
         List<String> coinIds = coins.stream().map(Coin::getId).collect(Collectors.toList());
         String ids = String.join(",", coinIds);
@@ -155,15 +187,18 @@ public class CoinService {
                     .filter(coinGeckoMarketDataResponse1 -> coinGeckoMarketDataResponse1.getId().equals(coin.getId()))
                     .findFirst().orElse(null);
 
-            if (coinGeckoMarketDataResponse != null){
+            if (coinGeckoMarketDataResponse != null) {
                 coinMapper.updateCoin(coin, coinGeckoMarketDataResponse);
                 coinRepository.save(coin);
             }
+            CoinUpdateResponse coinUpdateResponse = coinMapper.toCoinUpdateResponse(coin);
 
-            messagingTemplate.convertAndSend("/topic/coin/" + coin.getId(), coin);
+            messagingTemplate.convertAndSend("/topic/coin/" + coin.getId(), coinUpdateResponse);
         });
 
-        messagingTemplate.convertAndSend("/topic/coins", coins);
+        List<CoinUpdateResponse> coinUpdateResponses = coins.stream().map(coinMapper::toCoinUpdateResponse).toList();
+
+        messagingTemplate.convertAndSend("/topic/coins", coinUpdateResponses);
 
         Set<String> keys = redisTemplate.keys("coin-service:coin:*");
         redisTemplate.delete(keys);

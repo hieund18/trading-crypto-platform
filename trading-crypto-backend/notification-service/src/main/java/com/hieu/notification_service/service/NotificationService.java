@@ -7,6 +7,7 @@ import com.hieu.notification_service.exception.ErrorCode;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -14,6 +15,7 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class NotificationService {
     TemplateService templateService;
     Map<String, NotificationChannel> channels;
@@ -27,6 +29,7 @@ public class NotificationService {
             throw new AppException(ErrorCode.INVALID_CHANNEL);
 
         channel.send(request);
+        log.info("Send email success");
     }
 
     private SendNotificationRequest buildSendNotificationRequest(NotificationEvent notificationEvent) {

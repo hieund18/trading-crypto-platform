@@ -10,7 +10,7 @@ spring:
       uri: mongodb://root:root@localhost:27017/coin_service?authSource=admin
       auto-index-creation: true
   redis:
-    host: localhost
+    host: redis
     port: 6379
 #    password:
     database: 0

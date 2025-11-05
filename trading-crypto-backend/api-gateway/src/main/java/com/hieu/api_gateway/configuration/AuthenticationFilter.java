@@ -48,7 +48,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
             "/identity/users/forgot-password/.*",
             "/file/media/download/.*",
             "/coin/markets.*",
-            "/coin.*"
+            "/coin/ws/.*"
     };
 
     @NonFinal

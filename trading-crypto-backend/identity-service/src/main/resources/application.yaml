@@ -17,7 +17,7 @@ spring:
 
 jwt:
   signer-key: ${JWT_SIGNERKEY:/6zEjpNXnIJ1lAaprHIr/W6f+PAzLq+1etCA0+4Qt0vBb8bvj7PR0L27F/wT5WYj}
-  validation-duration: 3600 # in seconds
+  validation-duration: 36000 # in seconds
   refreshable-duration: 36000 # in seconds
   reset-duration: 300 # in seconds
 
@@ -25,6 +25,7 @@ app:
   services:
     otp: http://localhost:8081/otp
     profile: http://localhost:8083/profile
+    wallet: http://localhost:8086/wallet
   scheduler:
     delete-unverified-users-cron: "0 0 3 * * *"
 

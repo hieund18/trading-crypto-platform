@@ -2,6 +2,7 @@ package com.hieu.coin_service.mapper;
 
 import com.hieu.coin_service.dto.response.CoinGeckoMarketDataResponse;
 import com.hieu.coin_service.dto.response.CoinResponse;
+import com.hieu.coin_service.dto.response.CoinUpdateResponse;
 import com.hieu.coin_service.entity.Coin;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -17,4 +18,6 @@ public interface CoinMapper {
     void updateCoin(@MappingTarget Coin coin, CoinGeckoMarketDataResponse coinGeckoMarketDataResponse);
 
     void updateCoinResponse(@MappingTarget CoinResponse coinResponse, CoinGeckoMarketDataResponse coinGeckoMarketDataResponse);
+
+    CoinUpdateResponse toCoinUpdateResponse(Coin coin);
 }

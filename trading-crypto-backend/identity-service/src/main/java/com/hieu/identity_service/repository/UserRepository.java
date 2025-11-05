@@ -1,6 +1,8 @@
 package com.hieu.identity_service.repository;
 
 import com.hieu.identity_service.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -21,4 +23,6 @@ public interface UserRepository extends JpaRepository<User, String> {
     List<User> findAllByEmailVerifiedFalseAndCreatedAtBefore(Instant time);
 
     boolean existsByEmail(String email);
+
+    Page<User> findByUsernameContainingIgnoreCase(Pageable pageable, String keyword);
 }

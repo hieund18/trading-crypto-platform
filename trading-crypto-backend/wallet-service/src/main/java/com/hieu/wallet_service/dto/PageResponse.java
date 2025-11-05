@@ -1,0 +1,33 @@
+package com.hieu.wallet_service.dto;
+
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+
+import java.util.Collections;
+import java.util.List;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class PageResponse<T> {
+    int currentPage;
+    int sizePage;
+    int totalPage;
+    int totalElement;
+
+    @Builder.Default
+    List<T> content = Collections.emptyList();
+
+    public static <T> PageResponse<T> fromPage(Page<T> page){
+        return new PageResponse<>(
+                page.getNumber() + 1,
+                page.getSize(),
+                page.getTotalPages(),
+                page.getNumberOfElements(),
+                page.getContent()
+        );
+    }
+}

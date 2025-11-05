@@ -30,6 +30,7 @@ import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -51,7 +52,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
-public class UserService {
+public class  UserService {
 
     UserRepository userRepository;
     RoleRepository roleRepository;
@@ -65,6 +66,7 @@ public class UserService {
 
     ProfileService profileService;
     OtpService otpService;
+    WalletService walletService;
 
     @NonFinal
     @Value("${jwt.reset-duration}")
@@ -112,6 +114,12 @@ public class UserService {
 //            throw new AppException(ErrorCode.CANNOT_CREATE_PROFILE);
 //        }
 
+        WalletCreationRequest walletCreationRequest = WalletCreationRequest.builder()
+                .userId(user.getId())
+                .build();
+
+        var walletResponse = walletService.createWallet(walletCreationRequest);
+
         OtpCreationRequest otpCreationRequest = OtpCreationRequest.builder()
                 .recipient(request.getEmail())
                 .otpType(OtpType.EMAIL_VERIFICATION.name())
@@ -124,8 +132,9 @@ public class UserService {
 
             try {
                 profileService.deleteProfileByUserId(user.getId());
+                walletService.deleteWalletByUserId(user.getId());
             } catch (FeignException e) {
-                log.error("Error while delete profile", exception);
+                log.error("Error while delete profile, wallet", exception);
             }
 
             throw exception;
@@ -172,6 +181,21 @@ public class UserService {
         var pageData = userRepository.findAll(pageable);
 
         return PageResponse.fromPage(pageData.map(userMapper::toUserResponse));
+    }
+
+    public PageResponse<UserResponse> searchUsers(Pageable pageable, String keyword){
+        Pageable pageRequest = PageRequest.of(pageable.getPageNumber() -1, pageable.getPageSize(), pageable.getSort());
+
+        var pageData = userRepository.findByUsernameContainingIgnoreCase(pageRequest, keyword);
+
+        return PageResponse.fromPage(pageData.map(userMapper::toUserResponse));
+    }
+
+    public UserResponse getUserByUsername(String username){
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        return userMapper.toUserResponse(user);
     }
 
     public UserResponse getMyInfo() {
@@ -307,7 +331,7 @@ public class UserService {
 
         if (user != null && StringUtils.hasText(user.getPassword())) {
             OtpCreationRequest otpCreationRequest = otpMapper.toOtpCreationRequest(request);
-            otpCreationRequest.setOtpType("a");
+            otpCreationRequest.setOtpType(OtpType.FORGOT_PASSWORD.name());
 
 //            try {
             var otpResponse = otpService.createOtp(otpCreationRequest).getResult();

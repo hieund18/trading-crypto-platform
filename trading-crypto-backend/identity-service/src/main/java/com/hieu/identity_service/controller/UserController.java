@@ -13,6 +13,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.shaded.com.google.protobuf.Api;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,7 +35,7 @@ public class UserController {
     }
 
     @PostMapping("/register-local-login")
-    ApiResponse<Void> createUsernamePassword(@RequestBody @Valid UsernamePasswordCreationRequest request){
+    ApiResponse<Void> createUsernamePassword(@RequestBody @Valid UsernamePasswordCreationRequest request) {
         userService.createUsernamePassword(request);
 
         return ApiResponse.<Void>builder()
@@ -47,6 +50,13 @@ public class UserController {
                 .build();
     }
 
+    @GetMapping("/username/{username}")
+    ApiResponse<UserResponse> getUserByUsername(@PathVariable String username) {
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.getUserByUsername(username))
+                .build();
+    }
+
     @GetMapping
     ApiResponse<PageResponse<UserResponse>> getUsers(
             @RequestParam(value = "page", defaultValue = "1") int page,
@@ -56,6 +66,16 @@ public class UserController {
         authentication.getAuthorities().forEach(grantedAuthority -> log.info(grantedAuthority.getAuthority()));
         return ApiResponse.<PageResponse<UserResponse>>builder()
                 .result(userService.getUsers(page, size))
+                .build();
+    }
+
+    @GetMapping("/search")
+    ApiResponse<PageResponse<UserResponse>> searchUsers(
+            @PageableDefault(page = 1, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestParam(required = false, defaultValue = "") String keyword
+    ) {
+        return ApiResponse.<PageResponse<UserResponse>>builder()
+                .result(userService.searchUsers(pageable, keyword))
                 .build();
     }
 

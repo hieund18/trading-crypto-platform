@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CoinRepository extends MongoRepository<Coin, String> {
@@ -14,4 +15,6 @@ public interface CoinRepository extends MongoRepository<Coin, String> {
     Page<Coin> findAll(Pageable pageable);
 
     List<Coin> findByIdIn(List<String> ids);
+
+    Page<Coin> findByNameContainingIgnoreCaseAndIsActive(String keyword, Boolean isActive, Pageable pageable);
 }

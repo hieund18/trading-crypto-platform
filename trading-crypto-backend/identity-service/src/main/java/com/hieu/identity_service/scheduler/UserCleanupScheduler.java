@@ -4,6 +4,7 @@ package com.hieu.identity_service.scheduler;
 import com.hieu.identity_service.entity.User;
 import com.hieu.identity_service.repository.UserRepository;
 import com.hieu.identity_service.service.ProfileService;
+import com.hieu.identity_service.service.WalletService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -22,6 +23,7 @@ import java.util.List;
 public class UserCleanupScheduler {
     UserRepository userRepository;
     ProfileService profileService;
+    WalletService walletService;
 
     @Scheduled(cron = "${app.scheduler.delete-unverified-users-cron}")
     public void cleanupUnverifiedUsers() {
@@ -31,6 +33,7 @@ public class UserCleanupScheduler {
         unverifiedUsers.forEach(user -> {
             try {
                 profileService.deleteProfileByUserId(user.getId());
+                walletService.deleteWalletByUserId(user.getId());
                 userRepository.delete(user);
                 log.info("Deleted unverified user with userId: {}", user.getId());
             } catch (Exception exception) {

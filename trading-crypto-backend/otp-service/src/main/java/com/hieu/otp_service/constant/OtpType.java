@@ -12,7 +12,9 @@ public enum OtpType {
     EMAIL_VERIFICATION(3, 30, 5, 10, "email-verification"),
     FORGOT_PASSWORD(3, 10, 3, 3, "forgot-password"),
     TWO_FACTOR_AUTH(3, 10, 3, 3, "two-factor-auth"),
-    TRANSACTION(3, 1, 3, 1, "transaction");
+    TRANSACTION(3, 1, 3, 1, "transaction"),
+    WITHDRAW(3, 1, 3, 1, "transaction"),
+    TRANSFER(3, 1, 3, 1, "transaction"),
 
     ;
 

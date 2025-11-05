@@ -11,6 +11,7 @@
       <module fileurl="file://$PROJECT_DIR$/otp-service/otp-service.iml" filepath="$PROJECT_DIR$/otp-service/otp-service.iml" />
       <module fileurl="file://$PROJECT_DIR$/profile-service/profile-service.iml" filepath="$PROJECT_DIR$/profile-service/profile-service.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/trading-crypto-backend.iml" filepath="$PROJECT_DIR$/.idea/trading-crypto-backend.iml" />
+      <module fileurl="file://$PROJECT_DIR$/wallet-service/wallet-service.iml" filepath="$PROJECT_DIR$/wallet-service/wallet-service.iml" />
     </modules>
   </component>
 </project>
