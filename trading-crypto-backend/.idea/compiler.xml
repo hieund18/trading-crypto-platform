@@ -18,7 +18,7 @@
         <module name="api-gateway" />
         <module name="common" />
       </profile>
-      <profile name="Annotation profile for wallet-service" enabled="true">
+      <profile name="Annotation profile for order-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -34,8 +34,9 @@
         <module name="coin-service" />
         <module name="otp-service" />
         <module name="profile-service" />
-        <module name="file-service" />
+        <module name="order-service" />
         <module name="identity-service" />
+        <module name="file-service" />
         <module name="wallet-service" />
         <module name="notification-service" />
       </profile>
@@ -47,8 +48,10 @@
       <module name="file-service" target="17" />
       <module name="identity-service" target="17" />
       <module name="notification-service" target="17" />
+      <module name="order-service" target="17" />
       <module name="otp-service" target="17" />
       <module name="profile-service" target="17" />
+      <module name="trade-service" target="17" />
       <module name="wallet-service" target="17" />
     </bytecodeTargetLevel>
   </component>
@@ -60,8 +63,10 @@
       <module name="file-service" options="-parameters -Amapstruct.suppressGeneratorTimestamp=true -Amapstruct.defaultComponentModel=spring -Amapstruct.verbose=true" />
       <module name="identity-service" options="-parameters -Amapstruct.suppressGeneratorTimestamp=true -Amapstruct.defaultComponentModel=spring -Amapstruct.verbose=true" />
       <module name="notification-service" options="-parameters -Amapstruct.suppressGeneratorTimestamp=true -Amapstruct.defaultComponentModel=spring -Amapstruct.verbose=true" />
+      <module name="order-service" options="-parameters -Amapstruct.suppressGeneratorTimestamp=true -Amapstruct.defaultComponentModel=spring -Amapstruct.verbose=true" />
       <module name="otp-service" options="-parameters -Amapstruct.suppressGeneratorTimestamp=true -Amapstruct.defaultComponentModel=spring -Amapstruct.verbose=true" />
       <module name="profile-service" options="-parameters -Amapstruct.suppressGeneratorTimestamp=true -Amapstruct.defaultComponentModel=spring -Amapstruct.verbose=true" />
+      <module name="trade-service" options="-parameters" />
       <module name="wallet-service" options="-parameters -Amapstruct.suppressGeneratorTimestamp=true -Amapstruct.defaultComponentModel=spring -Amapstruct.verbose=true" />
     </option>
   </component>

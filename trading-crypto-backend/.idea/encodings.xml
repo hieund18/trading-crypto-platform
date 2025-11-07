@@ -12,10 +12,14 @@
     <file url="file://$PROJECT_DIR$/identity-service/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/notification-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/notification-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/order-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/order-service/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/otp-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/otp-service/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/profile-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/profile-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/trade-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/trade-service/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/wallet-service/src/main/java" charset="UTF-8" />
   </component>
 </project>

@@ -3,6 +3,8 @@ package com.hieu.coin_service.controller;
 import com.hieu.coin_service.dto.ApiResponse;
 import com.hieu.coin_service.dto.PageResponse;
 import com.hieu.coin_service.dto.request.AddCoinRequest;
+import com.hieu.coin_service.dto.request.ConvertAmountRequest;
+import com.hieu.coin_service.dto.request.ConvertQuantityRequest;
 import com.hieu.coin_service.dto.response.*;
 import com.hieu.coin_service.service.CoinGeckoService;
 import com.hieu.coin_service.service.CoinService;
@@ -74,10 +76,10 @@ public class CoinController {
 
     @GetMapping("/markets/search")
     ApiResponse<PageResponse<CoinResponse>> searchCoins(
-        @RequestParam(required = false, defaultValue = "") String keyword,
-        @RequestParam(required = false, defaultValue = "true") Boolean isActive,
-        @PageableDefault(page = 1, sort = "marketCapRank", direction = Sort.Direction.ASC) Pageable pageable
-    ){
+            @RequestParam(required = false, defaultValue = "") String keyword,
+            @RequestParam(required = false, defaultValue = "true") Boolean isActive,
+            @PageableDefault(page = 1, sort = "marketCapRank", direction = Sort.Direction.ASC) Pageable pageable
+    ) {
         return ApiResponse.<PageResponse<CoinResponse>>builder()
                 .result(coinService.searchCoins(pageable, isActive, keyword))
                 .build();
@@ -87,6 +89,20 @@ public class CoinController {
     ApiResponse<CoinResponse> updateCoinStatus(@PathVariable String id) {
         return ApiResponse.<CoinResponse>builder()
                 .result(coinService.updateCoinStatus(id))
+                .build();
+    }
+
+    @PostMapping("/convert/amount-to-quantity")
+    ApiResponse<ConvertResponse> convertAmountToQuantity(@RequestBody ConvertAmountRequest request) {
+        return ApiResponse.<ConvertResponse>builder()
+                .result(coinService.convertAmountToQuantity(request))
+                .build();
+    }
+
+    @PostMapping("/convert/quantity-to-amount")
+    ApiResponse<ConvertResponse> convertQuantityToAmount(@RequestBody ConvertQuantityRequest request) {
+        return ApiResponse.<ConvertResponse>builder()
+                .result(coinService.convertQuantityToAmount(request))
                 .build();
     }
 }

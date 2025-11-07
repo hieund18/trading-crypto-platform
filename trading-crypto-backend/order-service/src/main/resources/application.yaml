@@ -1,0 +1,22 @@
+server:
+  port: 8087
+  servlet:
+    context-path: /order
+
+spring:
+  application:
+    name: order-service
+  datasource:
+    url: ${DBMS_CONNECTION:jdbc:mysql://localhost:3306/order_service}
+    username: ${DBMS_USERNAME:root}
+    password: ${DBMS_PASSWORD:root}
+    driver-class-name: "com.mysql.cj.jdbc.Driver"
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+
+app:
+  services:
+    coin: http://localhost:8085/coin
+    wallet: http://localhost:8086/wallet

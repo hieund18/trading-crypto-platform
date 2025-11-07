@@ -4,9 +4,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hieu.coin_service.dto.PageResponse;
 import com.hieu.coin_service.dto.request.AddCoinRequest;
+import com.hieu.coin_service.dto.request.ConvertAmountRequest;
+import com.hieu.coin_service.dto.request.ConvertQuantityRequest;
 import com.hieu.coin_service.dto.response.CoinGeckoMarketDataResponse;
 import com.hieu.coin_service.dto.response.CoinResponse;
 import com.hieu.coin_service.dto.response.CoinUpdateResponse;
+import com.hieu.coin_service.dto.response.ConvertResponse;
 import com.hieu.coin_service.entity.Coin;
 import com.hieu.coin_service.exception.AppException;
 import com.hieu.coin_service.exception.ErrorCode;
@@ -150,7 +153,7 @@ public class CoinService {
         return coinResponse;
     }
 
-    public PageResponse<CoinResponse> searchCoins(Pageable pageable, Boolean isActive, String keyword){
+    public PageResponse<CoinResponse> searchCoins(Pageable pageable, Boolean isActive, String keyword) {
         Pageable pageRequest = PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize(), pageable.getSort());
         Page<Coin> coinPage = coinRepository.findByNameContainingIgnoreCaseAndIsActive(keyword, isActive, pageRequest);
 
@@ -173,6 +176,32 @@ public class CoinService {
         coinRepository.save(coin);
 
         return coinMapper.toCoinResponse(coin);
+    }
+
+    public ConvertResponse convertAmountToQuantity(ConvertAmountRequest request) {
+        Coin coin = coinRepository.findById(request.getCoinId())
+                .orElseThrow(() -> new AppException(ErrorCode.COIN_NOT_EXISTED));
+
+        Double currentPrice = coin.getCurrentPrice();
+
+        ConvertResponse convertResponse = coinMapper.toConvertResponse(request);
+        convertResponse.setPrice(currentPrice);
+        convertResponse.setQuantity(formatDouble(request.getAmount() / currentPrice));
+
+        return convertResponse;
+    }
+
+    public ConvertResponse convertQuantityToAmount(ConvertQuantityRequest request) {
+        Coin coin = coinRepository.findById(request.getCoinId())
+                .orElseThrow(() -> new AppException(ErrorCode.COIN_NOT_EXISTED));
+
+        Double currentPrice = coin.getCurrentPrice();
+
+        ConvertResponse convertResponse = coinMapper.toConvertResponse(request);
+        convertResponse.setPrice(currentPrice);
+        convertResponse.setAmount(formatDouble(request.getQuantity() * currentPrice));
+
+        return convertResponse;
     }
 
     @Scheduled(fixedRate = 60000)
@@ -218,5 +247,9 @@ public class CoinService {
         coinRepository.saveAll(listCoin);
 
         log.info("Init coin data complete...");
+    }
+
+    private double formatDouble(Double number) {
+        return Math.round(number * 100000.0) / 100000.0;
     }
 }

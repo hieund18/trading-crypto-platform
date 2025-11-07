@@ -16,5 +16,7 @@ public interface CoinRepository extends MongoRepository<Coin, String> {
 
     List<Coin> findByIdIn(List<String> ids);
 
+    List<Coin> findByIdInAndIsActiveTrue(List<String> ids);
+
     Page<Coin> findByNameContainingIgnoreCaseAndIsActive(String keyword, Boolean isActive, Pageable pageable);
 }
