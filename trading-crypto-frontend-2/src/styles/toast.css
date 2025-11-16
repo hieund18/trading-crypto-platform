@@ -1,0 +1,46 @@
+/* Container fix spacing */
+.binance-toast-container {
+  margin-top: 20px !important;
+  margin-right: 20px !important;
+}
+
+/* Toast base style */
+.MuiSnackbarContent-root {
+  padding: 14px 18px !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  color: #fff !important;
+  box-shadow: 0px 4px 14px rgba(0,0,0,0.5) !important;
+  animation: slideIn 0.3s ease forwards !important;
+  opacity: 0.95 !important;
+}
+
+/* Animation giống Binance */
+@keyframes slideIn {
+  from {
+    transform: translateX(50%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Variants */
+.MuiSnackbarContent-root.success {
+  background-color: #16a34a !important; /* xanh lá Binance */
+}
+
+.MuiSnackbarContent-root.error {
+  background-color: #dc2626 !important; /* đỏ Binance */
+}
+
+.MuiSnackbarContent-root.warning {
+  background-color: #f59e0b !important; /* vàng Binance */
+}
+
+.MuiSnackbarContent-root.info {
+  background-color: #3b82f6 !important; /* xanh dương Binance */
+}

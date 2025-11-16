@@ -12,6 +12,7 @@ import lombok.experimental.FieldDefaults;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AuthenticationResponse {
     Boolean require2FA;
+    Boolean requireVerifyEmail;
     String accessToken;
     String refreshToken;
     String recipient;

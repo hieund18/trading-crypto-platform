@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -48,6 +49,12 @@ public class UserProfileService {
 
     public UserProfileResponse createProfile(ProfileCreationRequest request) {
         UserProfile userProfile = userProfileMapper.toUserProfile(request);
+
+        if(!StringUtils.hasText(request.getFullName())){
+            String suffix = RandomStringUtils.randomAlphanumeric(6).toUpperCase();
+            userProfile.setFullName("Trader_" + suffix);
+        }
+
         userProfile.setAvatarUrl(defaultAvatarUrl);
         userProfile.setAvatarPath(defaultAvatarKey);
 

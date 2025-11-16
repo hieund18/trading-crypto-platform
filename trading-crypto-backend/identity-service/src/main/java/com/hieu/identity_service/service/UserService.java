@@ -283,51 +283,10 @@ public class  UserService {
         return userMapper.toUserResponse(user);
     }
 
-    public EmailVerificationOtpResponse sendEmailVerificationOtp(EmailVerificationOtpRequest request) {
-        User user = userRepository.findByEmail(request.getRecipient())
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-
-        if (user.getEmailVerified())
-            throw new AppException(ErrorCode.EMAIL_VERIFIED);
-
-        OtpCreationRequest otpCreationRequest = otpMapper.toOtpCreationRequest(request);
-        otpCreationRequest.setOtpType(OtpType.EMAIL_VERIFICATION.name());
-
-//        try {
-        var otpResponse = otpService.createOtp(otpCreationRequest).getResult();
-        return otpMapper.toEmailVerificationOtpResponse(otpResponse);
-//        } catch (FeignException exception) {
-//            throw new AppException(ErrorCode.CANNOT_SEND_OTP);
-//        }
-    }
-
-    public UserResponse verifyEmail(EmailVerificationRequest request) {
-        User user = userRepository.findByEmail(request.getRecipient())
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-
-        if (Boolean.TRUE.equals(user.getEmailVerified()))
-            throw new AppException(ErrorCode.EMAIL_VERIFIED);
-
-        VerifyOtpRequest verifyOtpRequest = otpMapper.toVerifyOtpRequest(request);
-        verifyOtpRequest.setOtpType(OtpType.EMAIL_VERIFICATION.name());
-
-//        try {
-        var response = otpService.verifyOtp(verifyOtpRequest).getResult();
-//        } catch (FeignException exception) {
-//            throw new AppException(ErrorCode.CANNOT_VERIFY_OTP);
-//        }
-
-        user.setEmailVerified(true);
-        user.setIsActive(true);
-
-        user = userRepository.save(user);
-
-        return userMapper.toUserResponse(user);
-    }
-
     public void sendForgotPasswordOtp(ForgotPasswordOtpRequest request) {
 
-        User user = userRepository.findByEmail(request.getRecipient()).orElse(null);
+        User user = userRepository.findByEmail(request.getRecipient())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         if (user != null && StringUtils.hasText(user.getPassword())) {
             OtpCreationRequest otpCreationRequest = otpMapper.toOtpCreationRequest(request);

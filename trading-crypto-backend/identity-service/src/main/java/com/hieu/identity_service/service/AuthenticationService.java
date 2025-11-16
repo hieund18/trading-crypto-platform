@@ -3,9 +3,7 @@ package com.hieu.identity_service.service;
 import com.hieu.identity_service.constant.OtpType;
 import com.hieu.identity_service.constant.PredefinedRole;
 import com.hieu.identity_service.dto.request.*;
-import com.hieu.identity_service.dto.response.AuthenticationResponse;
-import com.hieu.identity_service.dto.response.GithubEmailResponse;
-import com.hieu.identity_service.dto.response.IntrospectResponse;
+import com.hieu.identity_service.dto.response.*;
 import com.hieu.identity_service.entity.RefreshToken;
 import com.hieu.identity_service.entity.Role;
 import com.hieu.identity_service.entity.User;
@@ -109,13 +107,27 @@ public class AuthenticationService {
                     .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
         }
 
-        if (Boolean.FALSE.equals(user.getIsActive()))
-            throw new AppException(ErrorCode.DEACTIVATED_USER);
-
         boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
 
         if (!authenticated)
             throw new AppException(ErrorCode.UNAUTHENTICATED);
+
+        if(Boolean.FALSE.equals(user.getEmailVerified())){
+            OtpCreationRequest otpCreationRequest = OtpCreationRequest.builder()
+                    .recipient(user.getEmail())
+                    .otpType(OtpType.EMAIL_VERIFICATION.name())
+                    .build();
+
+            var otpResponse = otpService.createOtp(otpCreationRequest).getResult();
+
+            return AuthenticationResponse.builder()
+                    .recipient(user.getEmail())
+                    .requireVerifyEmail(true)
+                    .build();
+        }
+
+        if (Boolean.FALSE.equals(user.getIsActive()))
+            throw new AppException(ErrorCode.DEACTIVATED_USER);
 
         if (Boolean.TRUE.equals(user.getTwoFactorEnabled())) {
             OtpCreationRequest otpCreationRequest = OtpCreationRequest.builder()
@@ -476,6 +488,54 @@ public class AuthenticationService {
         }
     }
 
+    public EmailVerificationOtpResponse sendEmailVerificationOtp(EmailVerificationOtpRequest request) {
+        User user = userRepository.findByEmail(request.getRecipient())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        if (user.getEmailVerified())
+            throw new AppException(ErrorCode.EMAIL_VERIFIED);
+
+        OtpCreationRequest otpCreationRequest = otpMapper.toOtpCreationRequest(request);
+        otpCreationRequest.setOtpType(OtpType.EMAIL_VERIFICATION.name());
+
+//        try {
+        var otpResponse = otpService.createOtp(otpCreationRequest).getResult();
+        return otpMapper.toEmailVerificationOtpResponse(otpResponse);
+//        } catch (FeignException exception) {
+//            throw new AppException(ErrorCode.CANNOT_SEND_OTP);
+//        }
+    }
+
+    public AuthenticationResponse verifyEmail(EmailVerificationRequest request) {
+        User user = userRepository.findByEmail(request.getRecipient())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        if (Boolean.TRUE.equals(user.getEmailVerified()))
+            throw new AppException(ErrorCode.EMAIL_VERIFIED);
+
+        VerifyOtpRequest verifyOtpRequest = otpMapper.toVerifyOtpRequest(request);
+        verifyOtpRequest.setOtpType(OtpType.EMAIL_VERIFICATION.name());
+
+//        try {
+        var response = otpService.verifyOtp(verifyOtpRequest).getResult();
+//        } catch (FeignException exception) {
+//            throw new AppException(ErrorCode.CANNOT_VERIFY_OTP);
+//        }
+
+        user.setEmailVerified(true);
+        user.setIsActive(true);
+
+        user = userRepository.save(user);
+
+        String accessToken = generateAccessToken(user);
+        String refreshToken = generateRefreshToken(user);
+
+        return AuthenticationResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+    }
+
     private String generateAccessToken(User user) {
         JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.HS512);
 
@@ -552,4 +612,18 @@ public class AuthenticationService {
 
         return signedJWT;
     }
+
+//    private String maskEmail(String email){
+//        var parts = email.split("@");
+//        var local = parts[0];
+//        var domain = parts[1];
+//
+//        if(local.length() <= 2)
+//            return "***@" + domain;
+//
+//        String prefix = local.substring(0, 2);
+//        String suffix = local.substring(local.length() - 2);
+//
+//        return prefix + "***" + suffix + "@" + domain;
+//    }
 }

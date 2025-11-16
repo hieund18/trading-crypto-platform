@@ -41,6 +41,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
             "/identity/auth/logout",
             "/identity/auth/refresh",
             "/identity/auth/2fa/.*",
+            "/identity/auth/verify-email/.*",
             "/identity/auth/outbound/authentication",
             "/identity/auth/github/authentication",
             "/identity/users/registration",

@@ -3,12 +3,12 @@ package com.hieu.identity_service.controller;
 import com.hieu.identity_service.dto.ApiResponse;
 import com.hieu.identity_service.dto.request.*;
 import com.hieu.identity_service.dto.response.AuthenticationResponse;
+import com.hieu.identity_service.dto.response.EmailVerificationOtpResponse;
 import com.hieu.identity_service.dto.response.IntrospectResponse;
 import com.hieu.identity_service.service.AuthenticationService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.apache.kafka.shaded.com.google.protobuf.Api;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -86,5 +86,19 @@ public class AuthenticationController {
         authenticationService.sendTwoFactorOtp(request);
 
         return ApiResponse.<Void>builder().build();
+    }
+
+    @PostMapping("/verify-email/send-otp")
+    ApiResponse<EmailVerificationOtpResponse> sendEmailVerificationOtp(@RequestBody EmailVerificationOtpRequest request) {
+        return ApiResponse.<EmailVerificationOtpResponse>builder()
+                .result(authenticationService.sendEmailVerificationOtp(request))
+                .build();
+    }
+
+    @PostMapping("/verify-email/verify-otp")
+    ApiResponse<AuthenticationResponse> verifyEmail(@RequestBody EmailVerificationRequest request) {
+        return ApiResponse.<AuthenticationResponse>builder()
+                .result(authenticationService.verifyEmail(request))
+                .build();
     }
 }

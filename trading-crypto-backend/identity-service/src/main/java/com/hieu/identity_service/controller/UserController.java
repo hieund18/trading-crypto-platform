@@ -116,20 +116,6 @@ public class UserController {
                 .build();
     }
 
-    @PostMapping("/verify-email/send-otp")
-    ApiResponse<EmailVerificationOtpResponse> sendEmailVerificationOtp(@RequestBody EmailVerificationOtpRequest request) {
-        return ApiResponse.<EmailVerificationOtpResponse>builder()
-                .result(userService.sendEmailVerificationOtp(request))
-                .build();
-    }
-
-    @PostMapping("/verify-email/verify-otp")
-    ApiResponse<UserResponse> verifyEmail(@RequestBody EmailVerificationRequest request) {
-        return ApiResponse.<UserResponse>builder()
-                .result(userService.verifyEmail(request))
-                .build();
-    }
-
     @PostMapping("/forgot-password/send-otp")
     ApiResponse<Void> sendForgotPasswordOtp(@RequestBody ForgotPasswordOtpRequest request) {
         userService.sendForgotPasswordOtp(request);

@@ -22,7 +22,7 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     List<User> findAllByEmailVerifiedFalseAndCreatedAtBefore(Instant time);
 
-    boolean existsByEmail(String email);
+    boolean existsByEmailAndEmailVerifiedTrue(String email);
 
     Page<User> findByUsernameContainingIgnoreCase(Pageable pageable, String keyword);
 }

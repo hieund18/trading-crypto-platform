@@ -21,6 +21,7 @@ public class SecurityConfig {
             "/users/registration", "/users/verify-email/**", "/users/forgot-password/**",
             "/auth/token", "/auth/introspect", "/auth/logout", "/auth/refresh", "/auth/2fa/**",
             "/auth/outbound/authentication", "/auth/github/authentication", "/actuator/**",
+            "/auth/verify-email/**",
             "/my-info"
     };
 
