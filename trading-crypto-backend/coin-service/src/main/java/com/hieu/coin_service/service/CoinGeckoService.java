@@ -1,9 +1,6 @@
 package com.hieu.coin_service.service;
 
-import com.hieu.coin_service.dto.response.CoinGeckoMarketChartResponse;
-import com.hieu.coin_service.dto.response.CoinGeckoMarketDataResponse;
-import com.hieu.coin_service.dto.response.TrendingCoin;
-import com.hieu.coin_service.dto.response.TrendingResponse;
+import com.hieu.coin_service.dto.response.*;
 import com.hieu.coin_service.repository.httpclient.CoinGeckoClient;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -52,6 +49,13 @@ public class CoinGeckoService {
         var response = coinGeckoClient.getTrendingCoin(apiKey);
         log.info("Trending coin: {}", response);
 
+        return response;
+    }
+
+    public List<CoinGeckoMasterResponse> getAllCoins(){
+        var response = coinGeckoClient.getAllCoins(apiKey);
+
+        log.info("List coin: {}", response);
         return response;
     }
 }

@@ -7,14 +7,14 @@ export default function HeroSection() {
       sx={{
         textAlign: "center",
         py: 10,
-        color: "white",
+        color: "text.primary",
       }}
     >
       <Typography variant="h3" fontWeight={800} sx={{ mb: 2 }}>
         BitStorm — Giao dịch Crypto đơn giản & an toàn
       </Typography>
 
-      <Typography variant="h6" color="#94a3b8" sx={{ mb: 4 }}>
+      <Typography variant="h6" color="text.secondary" sx={{ mb: 4 }}>
         Nơi bạn có thể mua bán coin nhanh chóng, bảo mật tuyệt đối.
       </Typography>
 
@@ -22,7 +22,8 @@ export default function HeroSection() {
         href="/register"
         size="large"
         variant="contained"
-        sx={{ bgcolor: "#3b82f6" }}
+        color="primary"
+        sx={{}}
       >
         Bắt đầu ngay
       </Button>

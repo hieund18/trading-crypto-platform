@@ -1,11 +1,24 @@
 
+n
+java:S1192i"LDefine a constant instead of duplicating this literal "coin-update" 3 times.(ÙË…şÿÿÿÿ8Ö†µê«3
+j
+java:S1192e"NDefine a constant instead of duplicating this literal "UPDATE_FILTER" 3 times.(¢ÕÉ{8×†µê«3
+n	java:S117§"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(¥ØçÛ8Ù†µê«3
+†
+java:S1488k"dImmediately return this expression instead of assigning it to the temporary variable "coinResponse".(€Ç×ıÿÿÿÿ8Ú†µê«3
 ‡
-java:S1488 "dImmediately return this expression instead of assigning it to the temporary variable "pageResponse".(¤¹œóùÿÿÿÿ8ôÑ Ë¥3
-«
-java:S4449é"ŒAnnotate the parameter with @javax.annotation.Nullable in method 'delete' declaration, or make sure that null can not be passed as argument.(¹„“Ç8¢Ò Ë¥3
-X	java:S125F"<This block of commented-out lines of code should be removed.(ôƒñæ8§Ò Ë¥3
-I
-java:S1602t",Remove useless curly braces around statement(¸ÌÜî8®Ò Ë¥3
-^	java:S125”"<This block of commented-out lines of code should be removed.(„·Ìôúÿÿÿÿ8²Ò Ë¥3
-p
-java:S6204Ò"RReplace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()'(¬©¯ü8¸Ò Ë¥3
+java:S1488€"dImmediately return this expression instead of assigning it to the temporary variable "pageResponse".(çÖ’Äúÿÿÿÿ8Ú†µê«3
+‡
+java:S1488›"dImmediately return this expression instead of assigning it to the temporary variable "pageResponse".(çÖ’Äúÿÿÿÿ8Ú†µê«3
+‡
+java:S1488Ó"dImmediately return this expression instead of assigning it to the temporary variable "pageResponse".(¤¹œóùÿÿÿÿ8Û†µê«3
+b
+java:S2583“"DChange this condition so that it does not always evaluate to "false"(³Šˆ¦8È‚ß¬3
+b
+java:S2583±"DChange this condition so that it does not always evaluate to "false"(ëÏ®8æîÃê«3
+b
+java:S2583ª"DChange this condition so that it does not always evaluate to "false"(³Šˆ¦8É‚ß¬3
+W
+java:S3516Ç"9Refactor this method to not always return the same value.(º¼‚à8ö›µê«3
+|
+java:S2142Ä"^Either re-interrupt this method or rethrow the "InterruptedException" that can be caught here.(®ËúÃ8°œµê«3

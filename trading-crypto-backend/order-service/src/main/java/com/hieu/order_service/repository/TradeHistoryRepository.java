@@ -16,7 +16,16 @@ import java.util.List;
 @Repository
 public interface TradeHistoryRepository extends JpaRepository<TradeHistory, String> {
 
-    Page<TradeHistory> findAllByUserId(Pageable pageable, String userId);
+    @Query("""
+        SELECT th FROM TradeHistory th
+        WHERE th.userId = :userId
+          AND (:type IS NULL OR th.type = :type)
+    """)
+    Page<TradeHistory> findAllByUserIdAndType(
+            Pageable pageable,
+            @Param("userId") String userId,
+            @Param("type") String type
+    );
 
     List<TradeHistory> findByCreatedAtBetween(Instant from, Instant to);
 

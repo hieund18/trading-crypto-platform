@@ -110,7 +110,71 @@ export async function verifyEmailOtpApi(recipient, otpCode) {
   return res.data;
 }
 
+//logout
+export async function logoutApi(refreshToken) {
+  const res = await axios.post(`${BASE_URL}/auth/logout`, {
+    refreshToken,
+  });
+  return res.data; // { "code": 1000 }
+}
+
+export async function authenticateWithGoogleApi(code) {
+  // Endpoint: /identity/auth/outbound/authentication?code=...
+  const res = await api.post(`/identity/auth/outbound/authentication?code=${code}`);
+  return res.data;
+}
+
+// 2. API xác thực GitHub (MỚI)
+export async function authenticateWithGithubApi(code) {
+  // Endpoint riêng cho GitHub như bạn yêu cầu
+  const res = await api.post(`/identity/auth/github/authentication?code=${code}`);
+  return res.data;
+}
+
+// 🔥 API Liên kết tài khoản Google
+export async function linkGoogleAccountApi(code) {
+  const res = await api.post(`/identity/auth/outbound/link?code=${code}`);
+  return res.data;
+}
+
+// 🔥 API Liên kết tài khoản GitHub
+export async function linkGithubAccountApi(code) {
+  const res = await api.post(`/identity/auth/github/link?code=${code}`);
+  return res.data;
+}
+
+// API đăng ký Username/Password cho tài khoản Social
+export async function registerLocalLoginApi(data) {
+  // data: { username, password }
+  const res = await api.post("/identity/users/register-local-login", data);
+  return res.data;
+}
+
 export async function getMyInfo() {
   const res = await api.get("/identity/users/my-info");
   return res.data; // { code, result }
+}
+
+export async function changePasswordApi(data) {
+  // data input: { oldPassword, newPassword, confirmPassword }
+  
+  // Map lại key cho đúng yêu cầu backend: currentPassword
+  const payload = {
+    currentPassword: data.oldPassword, 
+    newPassword: data.newPassword,
+    confirmPassword: data.confirmPassword
+  };
+
+  const res = await api.post("/identity/users/change-password", payload);
+  return res.data;
+}
+
+// 2. Bật/Tắt 2FA
+export async function update2FaStatusApi(enable) {
+  // Vì là method PATCH, thường sẽ gửi body là trạng thái mong muốn
+  // Payload: { twoFactorEnabled: true/false }
+  const res = await api.patch("/identity/users/me/2fa", {
+    twoFactorEnabled: enable
+  });
+  return res.data;
 }

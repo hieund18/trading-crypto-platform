@@ -2,7 +2,8 @@ package com.hieu.order_service.service;
 
 import com.hieu.order_service.constant.TradeType;
 import com.hieu.order_service.dto.PageResponse;
-import com.hieu.order_service.dto.request.TradeAssetRequest;
+import com.hieu.order_service.dto.request.AssetBuyRequest;
+import com.hieu.order_service.dto.request.AssetSellRequest;
 import com.hieu.order_service.dto.request.TradeRequest;
 import com.hieu.order_service.dto.response.*;
 import com.hieu.order_service.entity.Asset;
@@ -25,8 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -43,7 +43,7 @@ public class AssetService {
     WalletService walletService;
 
     @Transactional
-    public void buyAsset(TradeAssetRequest request) {
+    public void buyAsset(AssetBuyRequest request) {
         CoinResponse coinResponse = null;
         try {
             coinResponse = coinService.getCoin(request.getCoinId()).getResult();
@@ -98,13 +98,13 @@ public class AssetService {
         tradeHistoryRepository.save(tradeHistory);
     }
 
-    public PageResponse<TradeHistoryResponse> getMyTradeHistory(Pageable pageable) {
+    public PageResponse<TradeHistoryResponse> getMyTradeHistory(Pageable pageable, String type) {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
 
         Pageable pageRequest = PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize(), pageable.getSort());
 
-        var pageData = tradeHistoryRepository.findAllByUserId(pageRequest, userId);
+        var pageData = tradeHistoryRepository.findAllByUserIdAndType(pageRequest, userId, type);
 
         return PageResponse.fromPage(pageData.map(tradeHistoryMapper::toTradeHistoryResponse));
     }
@@ -118,14 +118,14 @@ public class AssetService {
         double totalCurrentAmount = 0;
         double totalBuyAmount = 0;
 
-        Set<AssetCoinResponse> assetCoinResponseList = new HashSet<>();
+        List<AssetCoinResponse> assetCoinResponseList = new ArrayList<>();
 
         for (Asset asset : assetList) {
             AssetCoinResponse assetCoinResponse = assetMapper.toAssetCoinResponse(asset);
 
             var coinResponse = coinService.getCoin(asset.getCoinId()).getResult();
-            assetCoinResponse.setCoinName(coinResponse.getName());
-            assetCoinResponse.setImage(coinResponse.getImage());
+
+            assetMapper.updateAssetCoinResponse(assetCoinResponse, coinResponse);
 
             Double quantity = asset.getQuantity();
             Double buyAmount = quantity * asset.getBuyPrice();
@@ -147,6 +147,8 @@ public class AssetService {
         assetCoinResponseList.forEach(assetCoinResponse -> {
             assetCoinResponse.setPercentageAsset(assetCoinResponse.getCurrentAmount() / finalTotalAmount * 100);
         });
+
+        assetCoinResponseList.sort(Comparator.comparing(AssetCoinResponse::getCurrentAmount).reversed());
 
         double totalAmountChange = totalCurrentAmount - totalBuyAmount;
         double totalPercentageChange = totalAmountChange / totalBuyAmount * 100;
@@ -172,7 +174,7 @@ public class AssetService {
     }
 
     @Transactional
-    public void sellAsset(TradeAssetRequest request) {
+    public void sellAsset(AssetSellRequest request) {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
 
@@ -190,12 +192,13 @@ public class AssetService {
         }
 
         double currentPrice = coinResponse.getCurrentPrice();
-        Double amount = request.getAmount();
-        double quantity = Math.round(amount / currentPrice * 100000.0) / 100000.0;
+        Double quantity = request.getQuantity();
 
         double oldQuantity = asset.getQuantity();
         if (quantity > oldQuantity)
             throw new AppException(ErrorCode.INVALID_QUANTITY);
+
+        double amount = currentPrice * quantity;
 
         TradeRequest tradeRequest = TradeRequest.builder()
                 .name(coinResponse.getName())
@@ -220,7 +223,7 @@ public class AssetService {
         TradeHistory tradeHistory = tradeHistoryMapper.toTradeHistory(request);
         tradeHistory.setUserId(userId);
         tradeHistory.setType(TradeType.SELL.name());
-        tradeHistory.setQuantity(quantity);
+        tradeHistory.setAmount(amount);
         tradeHistory.setPrice(currentPrice);
         tradeHistoryRepository.save(tradeHistory);
     }

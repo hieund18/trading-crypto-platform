@@ -85,12 +85,13 @@ export default function ForgotPassword() {
           <Button
             type="submit"
             variant="contained"
+            color="primary"
             fullWidth
             disabled={isSubmitting}
             sx={{
               py: 1.2,
-              backgroundColor: "#3b82f6",
-              ":hover": { backgroundColor: "#2563eb" },
+              // backgroundColor: "#3b82f6",
+              // ":hover": { backgroundColor: "#2563eb" },
               fontWeight: 600,
               fontSize: 16
             }}
@@ -103,7 +104,7 @@ export default function ForgotPassword() {
             fullWidth
             onClick={() => nav("/login")}
             sx={{
-              color: "#3b82f6",
+              color: "primary.main",
               fontWeight: 600,
               mt: 1
             }}

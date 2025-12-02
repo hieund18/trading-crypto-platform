@@ -22,6 +22,9 @@ public class WebClientConfiguration {
     @Value("${app.services.identity}")
     private String urlIdentityService;
 
+    @Value("${app.frontend.url}")
+    private String urlFrontEnd;
+
     @Bean
     WebClient webClient() {
         return WebClient.builder()
@@ -41,10 +44,10 @@ public class WebClientConfiguration {
     CorsWebFilter corsWebFilter() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
 
-        corsConfiguration.setAllowedOrigins(List.of("http://localhost:5173"));
+        corsConfiguration.setAllowedOrigins(List.of(urlFrontEnd));
         corsConfiguration.setAllowedMethods(List.of("*"));
         corsConfiguration.setAllowedHeaders(List.of("*"));
-//        corsConfiguration.setAllowCredentials(false);
+        corsConfiguration.setAllowCredentials(false);
 
         UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = new UrlBasedCorsConfigurationSource();
         urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration);

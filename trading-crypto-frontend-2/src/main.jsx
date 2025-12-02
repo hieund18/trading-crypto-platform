@@ -12,6 +12,7 @@ import { SnackbarProvider } from "notistack";
 import { AppThemeProvider } from "./context/ThemeContext"; // <-- IMPORT MỚI
 import "./styles/toast.css";
 
+//import "./theme";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   // <ThemeProvider theme={binanceTheme}> // <-- XÓA DÒNG NÀY

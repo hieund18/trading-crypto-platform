@@ -14,10 +14,10 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class TransferRequest {
-    @NotBlank(message = "USERNAME_IS_REQUIRED")
-    String toUsername;
+    @NotBlank(message = "WALLET_ID_IS_REQUIRED")
+    String toWalletId;
 
     @NotNull(message = "AMOUNT_IS_REQUIRED")
-    @DecimalMin(value = "10000", message = "INVALID_AMOUNT")
+    @DecimalMin(value = "0", message = "INVALID_AMOUNT")
     BigDecimal amount;
 }

@@ -138,27 +138,28 @@ export default function Register() {
           <Button
             type="submit"
             variant="contained"
+            color="primary"
             size="large"
             disabled={isSubmitting}
             sx={{
-              bgcolor: "#3b82f6",
+              // bgcolor: "#3b82f6",
               fontWeight: 600,
-              "&:hover": { bgcolor: "#2563eb" },
+              // "&:hover": { bgcolor: "#2563eb" },
             }}
           >
             {isSubmitting ? "Đang tạo tài khoản..." : "Đăng ký"}
           </Button>
 
-          <Divider sx={{ my: 1, color: "white" }}>hoặc</Divider>
+          <Divider sx={{ my: 1, color: "text.secondary" }}>hoặc</Divider>
 
           <SocialLogin mode="register" />
 
-          <Typography textAlign="center" mt={2} color="white">
+          <Typography textAlign="center" mt={2} color="text.primary">
             Đã có tài khoản?{" "}
             <Link
               href="/login"
               underline="hover"
-              sx={{ color: "#3b82f6", fontWeight: 600 }}
+              sx={{ color: "primary.main", fontWeight: 600 }}
             >
               Đăng nhập
             </Link>

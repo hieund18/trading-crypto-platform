@@ -23,7 +23,7 @@ public enum ErrorCode {
     USER_NOT_EXISTED(1310, "User not existed", HttpStatus.NOT_FOUND),
     USERNAME_IS_REQUIRED(1303, "Username is required", HttpStatus.BAD_REQUEST),
 
-    INVALID_AMOUNT(6101, "Amount must be greater than 10000", HttpStatus.BAD_REQUEST),
+    INVALID_AMOUNT(6101, "Amount must be greater than 0", HttpStatus.BAD_REQUEST),
     AMOUNT_IS_REQUIRED(6102, "Amount is required", HttpStatus.BAD_REQUEST),
     BANK_NAME_IS_REQUIRED(6103, "Bank name is required", HttpStatus.BAD_REQUEST),
     BANK_ACCOUNT_IS_REQUIRED(6104, "Bank account is required", HttpStatus.BAD_REQUEST),
@@ -33,6 +33,8 @@ public enum ErrorCode {
     TRANSFER_NOT_EXISTED(6108, "Transfer request not existed", HttpStatus.NOT_FOUND),
     INVALID_RECIPIENT(6109, "Invalid recipient", HttpStatus.BAD_REQUEST),
     INVALID_TRANSFER(6110, "Invalid transfer", HttpStatus.BAD_REQUEST),
+    WALLET_ID_IS_REQUIRED(6102, "Wallet id is required", HttpStatus.BAD_REQUEST),
+    WALLET_NOT_EXISTED(6102, "Wallet not existed", HttpStatus.NOT_FOUND),
 
     ;
 

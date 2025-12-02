@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @FeignClient(name = "wallet-service", url = "${app.services.wallet}",
-    configuration = {AuthenticationRequestInterceptor.class})
+    configuration = {AuthenticationRequestInterceptor.class, CustomFeignErrorDecoder.class})
 public interface WalletClient {
     @PostMapping(value = "/trade/buy", produces = MediaType.APPLICATION_JSON_VALUE)
     ApiResponse<Void> buyCoin(@RequestBody TradeRequest request);

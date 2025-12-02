@@ -10,10 +10,10 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TradeAssetRequest {
+public class AssetBuyRequest {
     String coinId;
 
     @NotNull(message = "AMOUNT_IS_REQUIRED")
-    @DecimalMin(value = "10000", message = "INVALID_AMOUNT")
+    @DecimalMin(value = "1", message = "INVALID_AMOUNT")
     Double amount;
 }

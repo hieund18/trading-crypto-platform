@@ -33,10 +33,11 @@ public class WalletController {
 
     @GetMapping("/my-wallet-transaction")
     ApiResponse<PageResponse<WalletTransactionResponse>> getMyWalletTransaction(
+            @RequestParam(required = false) String type,
             @PageableDefault(page = 1, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         return ApiResponse.<PageResponse<WalletTransactionResponse>>builder()
-                .result(walletService.getMyWalletTransaction(pageable))
+                .result(walletService.getMyWalletTransaction(type, pageable))
                 .build();
     }
 

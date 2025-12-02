@@ -73,12 +73,12 @@ public class WalletService {
         return walletMapper.toWalletResponse(wallet);
     }
 
-    public PageResponse<WalletTransactionResponse> getMyWalletTransaction(Pageable pageable) {
+    public PageResponse<WalletTransactionResponse> getMyWalletTransaction(String type, Pageable pageable) {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
 
         Pageable pageRequest = PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize(), pageable.getSort());
-        var pageData = walletTransactionRepository.findAllByUserId(pageRequest, userId);
+        var pageData = walletTransactionRepository.findAllByUserIdAndType(pageRequest, userId, type);
 
         return PageResponse.fromPage(pageData.map(walletTransactionMapper::toWalletTransactionResponse));
     }
@@ -270,19 +270,14 @@ public class WalletService {
         if (request.getAmount().compareTo(wallet.getBalance()) > 0)
             throw new AppException(ErrorCode.INSUFFICIENT_BALANCE);
 
-        var toUser = identityService.getUserByUsername(request.getToUsername()).getResult();
-
-        if (toUser.getId().equals(userId))
-            throw new AppException(ErrorCode.INVALID_RECIPIENT);
-
-        walletRepository.findByUserId(toUser.getId())
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        Wallet toWallet = walletRepository.findById(request.getToWalletId())
+                .orElseThrow(() -> new AppException(ErrorCode.WALLET_NOT_EXISTED));
 
         transferRepository.findByFromUserId(userId).ifPresent(transferRepository::delete);
 
         Transfer transfer = transferMapper.toTransfer(request);
         transfer.setFromUserId(userId);
-        transfer.setToUserId(toUser.getId());
+        transfer.setToUserId(toWallet.getUserId());
 
         transfer = transferRepository.save(transfer);
 

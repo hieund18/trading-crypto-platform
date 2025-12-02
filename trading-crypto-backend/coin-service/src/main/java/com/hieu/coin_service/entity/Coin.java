@@ -23,6 +23,9 @@ public class Coin {
 
     String symbol;
 
+    @Indexed(unique = true, sparse = true)
+    String binanceSymbol;
+
     String name;
 
     String image;
@@ -52,6 +55,9 @@ public class Coin {
     double atl;
     double atlChangePercentage;
     Instant atlDate;
+
+    @Indexed
+    Integer trendingRank;
 
     Boolean isActive;
 

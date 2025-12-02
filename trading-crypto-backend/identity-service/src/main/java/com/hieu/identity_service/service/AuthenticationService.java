@@ -54,6 +54,7 @@ public class AuthenticationService {
 
     OtpService otpService;
     ProfileService profileService;
+    WalletService walletService;
 
     OutboundIdentityClient outboundIdentityClient;
     OutboundUserClient outboundUserClient;
@@ -199,6 +200,12 @@ public class AuthenticationService {
                                 .fullName(userInfo.getName())
                                 .build());
 
+                        WalletCreationRequest walletCreationRequest = WalletCreationRequest.builder()
+                                .userId(newUser.getId())
+                                .build();
+
+                        var walletResponse = walletService.createWallet(walletCreationRequest);
+
                         return newUser;
                     } catch (DataIntegrityViolationException exception) {
                         throw new AppException(ErrorCode.LOGIN_AND_LINK_REQUIRED);
@@ -287,6 +294,12 @@ public class AuthenticationService {
                                 .userId(newUser.getId())
                                 .fullName(userInfo.getName())
                                 .build());
+
+                        WalletCreationRequest walletCreationRequest = WalletCreationRequest.builder()
+                                .userId(newUser.getId())
+                                .build();
+
+                        var walletResponse = walletService.createWallet(walletCreationRequest);
 
                         return newUser;
                     } catch (DataIntegrityViolationException exception) {

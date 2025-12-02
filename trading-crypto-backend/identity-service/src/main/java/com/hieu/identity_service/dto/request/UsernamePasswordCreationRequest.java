@@ -16,6 +16,6 @@ public class UsernamePasswordCreationRequest {
     String username;
 
     @NotBlank(message = "PASSWORD_IS_REQUIRED")
-    @Size(min = 8, message = "INVALID_PASSWORD")
+    @Size(min = 3, message = "INVALID_PASSWORD")
     String password;
 }

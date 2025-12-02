@@ -174,11 +174,11 @@ public class  UserService {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    public PageResponse<UserResponse> getUsers(int page, int size) {
+    public PageResponse<UserResponse> getUsers(String keyword, Boolean isActive, Long roleId, Pageable pageable) {
 
-        Pageable pageable = PageRequest.of(page - 1, size, Sort.by("createdAt").descending());
+        Pageable pageRequest = PageRequest.of(pageable.getPageNumber()- 1, pageable.getPageSize(), pageable.getSort());
 
-        var pageData = userRepository.findAll(pageable);
+        var pageData = userRepository.searchUsers(pageRequest, isActive, keyword, roleId);
 
         return PageResponse.fromPage(pageData.map(userMapper::toUserResponse));
     }
@@ -234,6 +234,7 @@ public class  UserService {
         refreshTokenRepository.deleteAllByUserId(userId);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public UserResponse updateUserRoles(String userId, UserRoleUpdateRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
@@ -249,6 +250,7 @@ public class  UserService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public UserResponse updateUserStatus(String userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));

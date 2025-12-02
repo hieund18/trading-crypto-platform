@@ -1,9 +1,6 @@
 package com.hieu.coin_service.repository.httpclient;
 
-import com.hieu.coin_service.dto.response.CoinGeckoMarketChartResponse;
-import com.hieu.coin_service.dto.response.CoinGeckoMarketDataResponse;
-import com.hieu.coin_service.dto.response.TrendingCoin;
-import com.hieu.coin_service.dto.response.TrendingResponse;
+import com.hieu.coin_service.dto.response.*;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,4 +30,7 @@ public interface CoinGeckoClient {
 
     @GetMapping("/search/trending")
     TrendingResponse getTrendingCoin(@RequestHeader("x-cg-demo-api-key") String apiKey);
+
+    @GetMapping("/coins/list")
+    List<CoinGeckoMasterResponse> getAllCoins(@RequestHeader("x-cg-demo-api-key") String apiKey);
 }

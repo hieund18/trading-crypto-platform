@@ -9,6 +9,9 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -27,11 +30,11 @@ public class RoleController {
 
     @GetMapping
     ApiResponse<PageResponse<RoleResponse>> getRoles(
-            @RequestParam(value = "page", defaultValue = "1") int page,
-            @RequestParam(value = "size", defaultValue = "10") int size
+            @RequestParam(required = false, defaultValue = "") String name,
+            @PageableDefault(page = 1, sort = "name", direction = Sort.Direction.ASC) Pageable pageable
     ) {
         return ApiResponse.<PageResponse<RoleResponse>>builder()
-                .result(roleService.getRoles(page, size))
+                .result(roleService.getRoles(name, pageable))
                 .build();
     }
 

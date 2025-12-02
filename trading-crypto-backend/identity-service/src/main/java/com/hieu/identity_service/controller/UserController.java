@@ -59,13 +59,15 @@ public class UserController {
 
     @GetMapping
     ApiResponse<PageResponse<UserResponse>> getUsers(
-            @RequestParam(value = "page", defaultValue = "1") int page,
-            @RequestParam(value = "size", defaultValue = "10") int size
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Boolean isActive,
+            @RequestParam(required = false) Long roleId,
+            @PageableDefault(page = 1, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         authentication.getAuthorities().forEach(grantedAuthority -> log.info(grantedAuthority.getAuthority()));
         return ApiResponse.<PageResponse<UserResponse>>builder()
-                .result(userService.getUsers(page, size))
+                .result(userService.getUsers(keyword, isActive, roleId,pageable))
                 .build();
     }
 

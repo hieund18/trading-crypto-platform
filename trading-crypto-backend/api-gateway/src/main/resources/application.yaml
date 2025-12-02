@@ -5,6 +5,8 @@ app:
   api-prefix: /api/v1
   services:
     identity: http://localhost:8080/identity
+  frontend:
+    url: http://localhost:5173
 
 spring:
   application:
@@ -37,12 +39,12 @@ spring:
         filters:
         - StripPrefix=2
         - DedupeResponseHeader=Access-Control-Allow-Origin
-#      - id: coin_service_websocket
-#        uri: ws://localhost:8085
-#        predicates:
-#        - Path=${app.api-prefix}/coin/ws/**
-#        filters:
-#        - StripPrefix=2
+      - id: coin_service_websocket
+        uri: ws://localhost:8085
+        predicates:
+        - Path=${app.api-prefix}/coin/ws/**
+        filters:
+        - StripPrefix=2
       - id: wallet_service
         uri: http://localhost:8086
         predicates:

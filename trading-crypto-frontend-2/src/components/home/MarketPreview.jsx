@@ -10,7 +10,7 @@ const sample = [
 export default function MarketPreview() {
   return (
     <Box>
-      <Typography variant="h5" color="white" fontWeight={700} mb={2}>
+      <Typography variant="h5" color="text.primary" fontWeight={700} mb={2}>
         Thị trường phổ biến
       </Typography>
 
@@ -19,16 +19,17 @@ export default function MarketPreview() {
           <Paper
             key={i}
             sx={{
-              bgcolor: "#1e293b",
+              bgcolor: "background.paper",
               p: 2,
               borderRadius: 2,
               display: "flex",
               justifyContent: "space-between",
-              border: "1px solid #334155",
+              border: "1px solid", // <-- SỬA
+              borderColor: "divider", // <-- SỬA
             }}
           >
-            <Typography color="#e2e8f0">{c.symbol}</Typography>
-            <Typography fontWeight={700} color="white">
+            <Typography color="text.primary">{c.symbol}</Typography>
+            <Typography fontWeight={700} color="text.primary">
               {c.price}
             </Typography>
             <Typography

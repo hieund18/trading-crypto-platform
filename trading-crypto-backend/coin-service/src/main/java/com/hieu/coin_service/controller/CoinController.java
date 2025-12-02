@@ -5,7 +5,10 @@ import com.hieu.coin_service.dto.PageResponse;
 import com.hieu.coin_service.dto.request.AddCoinRequest;
 import com.hieu.coin_service.dto.request.ConvertAmountRequest;
 import com.hieu.coin_service.dto.request.ConvertQuantityRequest;
+import com.hieu.coin_service.dto.request.UpdateBinanceSymbolRequest;
 import com.hieu.coin_service.dto.response.*;
+import com.hieu.coin_service.entity.BinanceSymbolMaster;
+import com.hieu.coin_service.entity.CoinGeckoMaster;
 import com.hieu.coin_service.service.CoinGeckoService;
 import com.hieu.coin_service.service.CoinService;
 import lombok.AccessLevel;
@@ -61,9 +64,11 @@ public class CoinController {
     }
 
     @GetMapping("/markets/trending")
-    ApiResponse<List<CoinResponse>> getTrendingCoin() {
-        return ApiResponse.<List<CoinResponse>>builder()
-                .result(coinService.getTrendingCoins())
+    ApiResponse<PageResponse<CoinResponse>> getTrendingCoin(
+            @PageableDefault(page = 1, sort = "trendingRank", direction = Sort.Direction.ASC) Pageable pageable
+    ) {
+        return ApiResponse.<PageResponse<CoinResponse>>builder()
+                .result(coinService.getTrendingCoins(pageable))
                 .build();
     }
 
@@ -77,7 +82,7 @@ public class CoinController {
     @GetMapping("/markets/search")
     ApiResponse<PageResponse<CoinResponse>> searchCoins(
             @RequestParam(required = false, defaultValue = "") String keyword,
-            @RequestParam(required = false, defaultValue = "true") Boolean isActive,
+            @RequestParam(required = false) Boolean isActive,
             @PageableDefault(page = 1, sort = "marketCapRank", direction = Sort.Direction.ASC) Pageable pageable
     ) {
         return ApiResponse.<PageResponse<CoinResponse>>builder()
@@ -85,24 +90,51 @@ public class CoinController {
                 .build();
     }
 
-    @PatchMapping("/markets/{id}")
+    @PatchMapping("/markets/status/{id}")
     ApiResponse<CoinResponse> updateCoinStatus(@PathVariable String id) {
         return ApiResponse.<CoinResponse>builder()
                 .result(coinService.updateCoinStatus(id))
                 .build();
     }
 
-    @PostMapping("/convert/amount-to-quantity")
+    @PutMapping("/markets/binance-symbol/{id}")
+    ApiResponse<CoinResponse> updateBinanceSymbol(@PathVariable String id, @RequestBody UpdateBinanceSymbolRequest request) {
+        return ApiResponse.<CoinResponse>builder()
+                .result(coinService.updateBinanceSymbol(id, request))
+                .build();
+    }
+
+    @PostMapping("/markets/convert/amount-to-quantity")
     ApiResponse<ConvertResponse> convertAmountToQuantity(@RequestBody ConvertAmountRequest request) {
         return ApiResponse.<ConvertResponse>builder()
                 .result(coinService.convertAmountToQuantity(request))
                 .build();
     }
 
-    @PostMapping("/convert/quantity-to-amount")
+    @PostMapping("/markets/convert/quantity-to-amount")
     ApiResponse<ConvertResponse> convertQuantityToAmount(@RequestBody ConvertQuantityRequest request) {
         return ApiResponse.<ConvertResponse>builder()
                 .result(coinService.convertQuantityToAmount(request))
+                .build();
+    }
+
+    @GetMapping("/master/coingecko/search")
+    ApiResponse<PageResponse<CoinGeckoMaster>> searchCoinGeckoMaster(
+            @RequestParam(required = false, defaultValue = "") String keyword,
+            @PageableDefault(page = 1, sort = "name", direction = Sort.Direction.ASC) Pageable pageable
+    ) {
+        return ApiResponse.<PageResponse<CoinGeckoMaster>>builder()
+                .result(coinService.searchCoinGeckoMaster(pageable, keyword))
+                .build();
+    }
+
+    @GetMapping("/master/binance-symbol/search")
+    ApiResponse<PageResponse<BinanceSymbolMaster>> searchBinanceSymbolMaster(
+            @RequestParam(required = false, defaultValue = "") String keyword,
+            @PageableDefault(page = 1, sort = "symbol", direction = Sort.Direction.ASC) Pageable pageable
+    ) {
+        return ApiResponse.<PageResponse<BinanceSymbolMaster>>builder()
+                .result(coinService.searchBinanceSymbolMaster(pageable, keyword))
                 .build();
     }
 }

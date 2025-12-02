@@ -6,10 +6,7 @@ import AuthLayout from "../../components/auth/AuthLayout";
 import OtpInput from "../../components/auth/OtpInput";
 import { useToast } from "../../utils/toast";
 
-import {
-  sendVerifyEmailOtpApi,
-  verifyEmailOtpApi
-} from "../../api/authApi";
+import { sendVerifyEmailOtpApi, verifyEmailOtpApi } from "../../api/authApi";
 
 import { setToken, setRefreshToken } from "../../api/tokenUtils";
 import { useAuth } from "../../context/AuthContext";
@@ -91,7 +88,6 @@ export default function VerifyEmailOtp() {
       } else {
         nav("/dashboard", { replace: true });
       }
-
     } catch (err) {
       const backend = err.response?.data;
       toastError(backend?.message || "Không thể xác thực OTP!");
@@ -134,7 +130,7 @@ export default function VerifyEmailOtp() {
           Nhập mã gồm <b>6 số</b> đã gửi đến email:
         </Typography>
 
-        <Typography fontWeight={700} color="#3b82f6">
+        <Typography fontWeight={700} color="primary.main">
           {email}
         </Typography>
 
@@ -148,9 +144,10 @@ export default function VerifyEmailOtp() {
 
         <Button
           variant="contained"
+          color="primary"
           fullWidth
           onClick={handleVerify}
-          sx={{ mt: 2, bgcolor: "#3b82f6" }}
+          sx={{ mt: 2 }}
         >
           Xác nhận
         </Button>
@@ -159,7 +156,7 @@ export default function VerifyEmailOtp() {
           fullWidth
           onClick={handleResend}
           disabled={countdown > 0 || isResending}
-          sx={{ opacity: countdown > 0 ? 0.5 : 1 }}
+          sx={{ opacity: countdown > 0 ? 0.5 : 1, color: "primary.main" }}
         >
           {isResending
             ? "Đang gửi..."
@@ -168,7 +165,11 @@ export default function VerifyEmailOtp() {
             : "Gửi lại mã OTP"}
         </Button>
 
-        <Button fullWidth onClick={() => nav("/login")}>
+        <Button
+          fullWidth
+          onClick={() => nav("/login")}
+          sx={{ color: "primary.main" }}
+        >
           Quay lại đăng nhập
         </Button>
       </Stack>

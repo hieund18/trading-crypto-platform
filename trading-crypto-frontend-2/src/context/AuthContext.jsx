@@ -1,6 +1,14 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+// src/context/AuthContext.jsx
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect
+} from "react";
+
 import { getToken, setToken, clearAuth } from "../api/tokenUtils";
 import { getMyInfo } from "../api/authApi";
+import { getMyProfileApi } from "../api/profileApi";
 
 const AuthContext = createContext(null);
 
@@ -9,13 +17,53 @@ export function useAuth() {
 }
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);       // full user info từ my-info
+  const [user, setUser] = useState(null);
   const [token, setAccessToken] = useState(null);
-  const [loading, setLoading] = useState(true); // chờ load my-info sau reload
+  const [loading, setLoading] = useState(true);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  // 🧩 Load token từ localStorage khi F5 trang
+  // ============================================
+  // 🔥 HÀM GỘP USER CHUẨN MICRO-SERVICE
+  // ============================================
+  const fetchAndMergeUser = async () => {
+    try {
+      // Gọi Identity + Profile song song
+      const [identityRes, profileRes] = await Promise.all([
+        getMyInfo(),
+        getMyProfileApi()
+      ]);
+
+      if (identityRes.code !== 1000) {
+        throw new Error("Cannot load identity info");
+      }
+
+      const identityUser = identityRes.result;
+      const profileUser =
+        profileRes.code === 1000 ? profileRes.result : null;
+
+      // Gộp theo chuẩn:
+      // identity ở ngoài, profile trong 1 field riêng
+      const fullUser = {
+        ...identityUser,
+        profile: profileUser
+      };
+
+      setUser(fullUser);
+      return fullUser;
+    } catch (err) {
+      console.error("Failed to fetch user → logout:", err);
+      clearAuth();
+      setUser(null);
+      return null;
+    }
+  };
+
+  // ============================================
+  // 🔥 LOAD USER KHI F5 TRANG
+  // ============================================
   useEffect(() => {
     const savedToken = getToken();
+
     if (!savedToken) {
       setLoading(false);
       return;
@@ -23,44 +71,40 @@ export function AuthProvider({ children }) {
 
     setAccessToken(savedToken);
 
-    // 🔥 Gọi API my-info để lấy user
-    getMyInfo()
-      .then((res) => {
-        if (res.code === 1000) {
-          setUser(res.result);
-        }
-      })
-      .catch(() => {
-        clearAuth();
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    fetchAndMergeUser().finally(() => setLoading(false));
   }, []);
 
-  // 🧩 Hàm login sau khi có token từ API login
+  // ============================================
+  // 🔥 LOGIN (sau khi lấy được accessToken)
+  // ============================================
   const login = async (accessToken) => {
     setToken(accessToken);
     setAccessToken(accessToken);
 
-    try {
-      const res = await getMyInfo();
-      if (res.code === 1000) {
-        setUser(res.result);
-        return res.result;
-      }
-    } catch (e) {
-      clearAuth();
-      return null;
-    }
+    return await fetchAndMergeUser();
   };
 
+  // ============================================
+  // 🔥 LOGOUT (client-side)
+  // ============================================
   const logout = () => {
+    setIsLoggingOut(true);
+
+    if (user?.id) {
+      sessionStorage.removeItem(`skip_pass_setup_${user.id}`);
+    }
+
     clearAuth();
     setUser(null);
     setAccessToken(null);
+
+    // Tắt trạng thái logout sau 1 tick
+    setTimeout(() => setIsLoggingOut(false), 50);
   };
 
+  // ============================================
+  // PROVIDER
+  // ============================================
   return (
     <AuthContext.Provider
       value={{
@@ -69,6 +113,7 @@ export function AuthProvider({ children }) {
         login,
         logout,
         loading,
+        isLoggingOut
       }}
     >
       {children}

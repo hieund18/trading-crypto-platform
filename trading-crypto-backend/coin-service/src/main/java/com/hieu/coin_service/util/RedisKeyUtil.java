@@ -16,4 +16,12 @@ public class RedisKeyUtil {
     public static String trendingCoins(){
         return PREFIX + "coin:trending";
     }
+
+    public static String binanceTicker(String symbol){
+        return PREFIX + "ticker:" + symbol.toUpperCase();
+    }
+
+    public static String leaderboard(String type){
+        return PREFIX + "leaderboard:" + type;
+    }
 }

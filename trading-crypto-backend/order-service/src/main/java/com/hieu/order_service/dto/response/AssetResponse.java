@@ -3,6 +3,7 @@ package com.hieu.order_service.dto.response;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -15,5 +16,5 @@ public class AssetResponse {
     Double totalAmountChange;
     Double totalPercentageChange;
 
-    Set<AssetCoinResponse> coins;
+    List<AssetCoinResponse> coins;
 }

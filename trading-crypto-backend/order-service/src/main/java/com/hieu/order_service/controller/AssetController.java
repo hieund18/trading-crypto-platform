@@ -2,7 +2,8 @@ package com.hieu.order_service.controller;
 
 import com.hieu.order_service.dto.ApiResponse;
 import com.hieu.order_service.dto.PageResponse;
-import com.hieu.order_service.dto.request.TradeAssetRequest;
+import com.hieu.order_service.dto.request.AssetBuyRequest;
+import com.hieu.order_service.dto.request.AssetSellRequest;
 import com.hieu.order_service.dto.response.AssetResponse;
 import com.hieu.order_service.dto.response.AvailableQuantityResponse;
 import com.hieu.order_service.dto.response.TradeHistoryResponse;
@@ -24,7 +25,7 @@ public class AssetController {
     AssetService assetService;
 
     @PostMapping("/buy")
-    ApiResponse<Void> buyCoin(@RequestBody @Valid TradeAssetRequest request) {
+    ApiResponse<Void> buyCoin(@RequestBody @Valid AssetBuyRequest request) {
         assetService.buyAsset(request);
 
         return ApiResponse.<Void>builder().build();
@@ -32,10 +33,11 @@ public class AssetController {
 
     @GetMapping("/my-trade-history")
     ApiResponse<PageResponse<TradeHistoryResponse>> getMyTradeHistory(
+            @RequestParam(required = false) String type,
             @PageableDefault(page = 1, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         return ApiResponse.<PageResponse<TradeHistoryResponse>>builder()
-                .result(assetService.getMyTradeHistory(pageable))
+                .result(assetService.getMyTradeHistory(pageable, type))
                 .build();
     }
 
@@ -54,7 +56,7 @@ public class AssetController {
     }
 
     @PostMapping("/sell")
-    ApiResponse<Void> sellAsset(@RequestBody @Valid TradeAssetRequest request) {
+    ApiResponse<Void> sellAsset(@RequestBody @Valid AssetSellRequest request) {
         assetService.sellAsset(request);
 
         return ApiResponse.<Void>builder().build();

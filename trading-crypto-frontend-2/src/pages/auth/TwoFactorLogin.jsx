@@ -144,7 +144,7 @@ export default function TwoFactorLogin() {
           Vui lòng nhập mã xác thực <b>6 số</b> được gửi tới email:
         </Typography>
 
-        <Typography fontWeight={700} color="#3b82f6">
+        <Typography fontWeight={700} color="primary.main">
           {email}
         </Typography>
 
@@ -160,7 +160,8 @@ export default function TwoFactorLogin() {
           variant="contained"
           fullWidth
           onClick={handleVerify}
-          sx={{ mt: 2, bgcolor: "#3b82f6" }}
+          color="primary"
+          sx={{ mt: 2 }}
         >
           Xác nhận đăng nhập
         </Button>
@@ -168,6 +169,7 @@ export default function TwoFactorLogin() {
         <Button
           fullWidth
           onClick={handleResend}
+          sx={{ color: "primary.main" }}
           // 7. Vô hiệu hóa nút
           disabled={countdown > 0 || isResending}
         >
@@ -178,7 +180,11 @@ export default function TwoFactorLogin() {
             : "Gửi lại mã OTP"}
         </Button>
 
-        <Button fullWidth onClick={() => nav("/login")}>
+        <Button
+          fullWidth
+          onClick={() => nav("/login")}
+          sx={{ color: "primary.main" }}
+        >
           Quay lại đăng nhập
         </Button>
       </Stack>

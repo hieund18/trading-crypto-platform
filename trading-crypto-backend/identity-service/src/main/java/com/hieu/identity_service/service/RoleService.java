@@ -18,6 +18,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -50,11 +51,12 @@ public class RoleService {
         return roleMapper.toRoleResponse(role);
     }
 
-    public PageResponse<RoleResponse> getRoles(int page, int size) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public PageResponse<RoleResponse> getRoles(String name, Pageable pageable) {
 
-        Pageable pageable = PageRequest.of(page - 1, size, Sort.by("name").ascending());
+        Pageable pageRequest = PageRequest.of(pageable.getPageNumber() -1, pageable.getPageSize(), pageable.getSort());
 
-        var pageData = roleRepository.findAll(pageable);
+        var pageData = roleRepository.findByNameContainingIgnoreCase(name, pageRequest);
 
         return PageResponse.fromPage(pageData.map(roleMapper::toRoleResponse));
     }

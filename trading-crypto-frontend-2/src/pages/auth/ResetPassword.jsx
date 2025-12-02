@@ -103,8 +103,8 @@ export default function ResetPassword() {
             disabled={isSubmitting}
             sx={{
               py: 1.2,
-              bgcolor: "#3b82f6",
-              ":hover": { bgcolor: "#2563eb" },
+              // bgcolor: "#3b82f6",
+              // ":hover": { bgcolor: "#2563eb" },
             }}
           >
             {isSubmitting ? "Đang cập nhật..." : "Cập nhật mật khẩu"}
@@ -113,7 +113,7 @@ export default function ResetPassword() {
           <Button
             fullWidth
             onClick={() => nav("/login")}
-            sx={{ color: "#3b82f6", fontWeight: 600 }}
+            sx={{ color: "primary.main", fontWeight: 600 }}
           >
             Quay lại đăng nhập
           </Button>

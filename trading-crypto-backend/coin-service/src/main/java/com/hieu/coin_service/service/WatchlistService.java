@@ -13,7 +13,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -54,6 +56,10 @@ public class WatchlistService {
         List<String> coinIds = listWatchlist.stream().map(Watchlist::getCoinId).toList();
 
         var listCoins = coinRepository.findByIdInAndIsActiveTrue(coinIds);
+
+        if(!CollectionUtils.isEmpty(listCoins)){
+            listCoins.sort(Comparator.comparing(Coin::getMarketCap).reversed());
+        }
 
         return listCoins.stream().map(coinMapper::toCoinResponse).toList();
     }

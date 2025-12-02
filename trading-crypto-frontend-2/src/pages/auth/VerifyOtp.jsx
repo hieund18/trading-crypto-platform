@@ -41,7 +41,7 @@ export default function VerifyOtp() {
   // 🔥 EFFECT ĐỂ CHẠY ĐỒNG HỒ ĐẾM NGƯỢC
   // ==========================================================
   useEffect(() => {
-      setCountdown(60);
+    setCountdown(60);
   }, []);
 
   useEffect(() => {
@@ -119,9 +119,7 @@ export default function VerifyOtp() {
       }
       const backend = err.response.data;
       if (backend.code === 1004) {
-        toastWarning(
-          backend.message || "Bạn gửi quá nhiều yêu cầu!"
-        );
+        toastWarning(backend.message || "Bạn gửi quá nhiều yêu cầu!");
       } else {
         toastError(backend.message || "Không thể gửi lại OTP!");
       }
@@ -140,7 +138,7 @@ export default function VerifyOtp() {
         <Typography color="text.secondary" textAlign="center">
           Nhập mã xác thực gồm <b>6 số</b> đã được gửi tới email:
         </Typography>
-        <Typography fontWeight={700} color="#3b82f6">
+        <Typography fontWeight={700} color="primary.main">
           {email}
         </Typography>
         <OtpInput value={otp} onChange={handleOtpChange} />
@@ -153,17 +151,19 @@ export default function VerifyOtp() {
         {/* VERIFY */}
         <Button
           variant="contained"
+          color="primary"
           fullWidth
           onClick={handleVerify}
-          sx={{ mt: 2, bgcolor: "#3b82f6" }}
+          sx={{ mt: 2 }}
         >
-          Xác nhận OTP
+          Xác nhận
         </Button>
 
         {/* RESEND */}
         <Button
           fullWidth
           onClick={handleResend}
+          sx={{ color: "primary.main" }}
           // 7. Vô hiệu hóa nút khi đang đếm ngược hoặc đang gọi API
           disabled={countdown > 0 || isResending}
         >
@@ -175,7 +175,11 @@ export default function VerifyOtp() {
         </Button>
 
         {/* BACK */}
-        <Button fullWidth onClick={() => nav("/forgot-password")}>
+        <Button
+          fullWidth
+          onClick={() => nav("/forgot-password")}
+          sx={{ color: "primary.main" }}
+        >
           Quay lại
         </Button>
       </Stack>

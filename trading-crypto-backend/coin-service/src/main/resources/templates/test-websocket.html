@@ -14,7 +14,7 @@
 <!--        stompClient.subscribe('/topic/coins', function(message) {-->
 <!--            console.log("Received: ", message.body);-->
 <!--        });-->
-        stompClient.subscribe('/topic/coin/bitcoin', function(message) {
+        stompClient.subscribe('/topic/ticker/BTCUSDT', function(message) {
             console.log("Received: ", message.body);
         });
     });

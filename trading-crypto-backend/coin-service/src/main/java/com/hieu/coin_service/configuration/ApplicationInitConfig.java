@@ -1,6 +1,7 @@
 package com.hieu.coin_service.configuration;
 
 import com.hieu.coin_service.service.CoinService;
+import com.hieu.coin_service.service.MarketChartService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
@@ -13,10 +14,12 @@ import org.springframework.data.mongodb.config.EnableMongoAuditing;
 public class ApplicationInitConfig {
 
     @Bean
-    public ApplicationRunner applicationRunner(CoinService coinService){
+    public ApplicationRunner applicationRunner(CoinService coinService, MarketChartService marketChartService){
         log.info("Initializing application...");
         return args -> {
             coinService.initCoins();
+
+            marketChartService.initMarketChart();
 
             log.info("Application initialization complete...");
         };

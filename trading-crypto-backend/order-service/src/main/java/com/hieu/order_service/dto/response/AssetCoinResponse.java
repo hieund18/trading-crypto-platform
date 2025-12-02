@@ -10,8 +10,11 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AssetCoinResponse {
     String coinId;
-    String coinName;
+    String symbol;
+    String name;
     String image;
+
+    double currentPrice;
     Double quantity;
     Double buyPrice;
     Double percentageChange;

@@ -28,7 +28,7 @@ public enum ErrorCode {
     COIN_NOT_EXISTED(5103, "Coin not existed", HttpStatus.NOT_FOUND),
 
     CANNOT_TRADE_WALLET(6001, "Cannot trade wallet", HttpStatus.INTERNAL_SERVER_ERROR),
-    INVALID_AMOUNT(6101, "Amount must be greater than 10000", HttpStatus.BAD_REQUEST),
+    INVALID_AMOUNT(6101, "Amount must be greater than 1", HttpStatus.BAD_REQUEST),
     AMOUNT_IS_REQUIRED(6102, "Amount is required", HttpStatus.BAD_REQUEST),
     BANK_NAME_IS_REQUIRED(6103, "Bank name is required", HttpStatus.BAD_REQUEST),
     BANK_ACCOUNT_IS_REQUIRED(6104, "Bank account is required", HttpStatus.BAD_REQUEST),

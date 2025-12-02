@@ -13,6 +13,7 @@ import java.time.Instant;
 public class CoinResponse {
     String id;
     String symbol;
+    String binanceSymbol;
     String name;
     String image;
 
@@ -41,7 +42,7 @@ public class CoinResponse {
     double atl;
     double atlChangePercentage;
     Instant atlDate;
-
+    Integer trendingRank;
     Boolean isActive;
     Instant createdAt;
     Instant updatedAt;

@@ -8,7 +8,7 @@ export default function AuthLayout({ title, children }) {
     <Box
       sx={{
         minHeight: "100vh",
-        bgcolor: "#181a20",
+        bgcolor: "background.default",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -19,8 +19,9 @@ export default function AuthLayout({ title, children }) {
         sx={{
           p: 4,
           width: 400,
-          bgcolor: "#1e2329",
-          border: "1px solid #2b3139",
+          bgcolor: "background.paper", // <-- SỬA
+          border: "1px solid", // <-- SỬA
+          borderColor: "divider", // <-- SỬA
           borderRadius: 2,
         }}
       >
@@ -38,7 +39,7 @@ export default function AuthLayout({ title, children }) {
           <Logo size={40} showText />
 
           {/* Title form (Đăng nhập / Đăng ký) */}
-          <Typography variant="h5" fontWeight={700} color="white">
+          <Typography variant="h5" fontWeight={700} color="text.primary">
             {title}
           </Typography>
         </Box>

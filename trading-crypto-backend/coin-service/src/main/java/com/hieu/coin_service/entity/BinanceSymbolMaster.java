@@ -1,26 +1,18 @@
 package com.hieu.coin_service.entity;
 
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
-
-import java.time.Instant;
 
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "market_chart_data")
-public class MarketChartData {
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@Document(collection = "binance_symbol_masters")
+public class BinanceSymbolMaster {
     @MongoId
-    String id;
-
-    String coinId;
-
-    int days;
-
-    long timestamp;
-
-    double price;
+    String symbol;
 }

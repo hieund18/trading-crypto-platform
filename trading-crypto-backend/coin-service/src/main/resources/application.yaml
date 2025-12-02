@@ -14,8 +14,22 @@ spring:
     port: 6379
 #    password:
     database: 0
+  kafka:
+    bootstrap-servers: localhost:9094
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
 outbound:
   market:
     coingecko:
-      api-key: ${COINGECKO_API_KEY:CG-av6Sb9hYayEuQtg7fWzBPyZF}
+      api-key: ${COINGECKO_API_KEY}
       url: https://api.coingecko.com/api/v3
+    binance:
+      url: https://api.binance.com/api/v3
+      ws: wss://stream.binance.com:9443/ws/!miniTicker@arr

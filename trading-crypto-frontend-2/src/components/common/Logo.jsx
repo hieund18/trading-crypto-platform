@@ -10,23 +10,23 @@ export default function Logo({ size = 48, showText = true }) {
     <Box
       sx={{
         display: "flex",
-        alignItems: "center",      // canh giữa theo chiều dọc coin + text
+        alignItems: "center", // canh giữa theo chiều dọc coin + text
         gap: 1.2,
       }}
     >
       {/* Coin Logo */}
       <Box
-        sx={{
+        sx={(theme) => ({
           width: coinSize,
           height: coinSize,
           borderRadius: "50%",
-          background: "radial-gradient(circle, #3b82f6 0%, #1e40af 90%)",
-          border: "3px solid #60a5fa",
+          background: `radial-gradient(circle, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 90%)`,
+          border: `3px solid ${theme.palette.primary.light}`,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           boxShadow: "0 0 10px rgba(59,130,246,0.45)",
-        }}
+        })}
       >
         <Typography
           sx={{
@@ -49,10 +49,10 @@ export default function Logo({ size = 48, showText = true }) {
           sx={{
             fontSize: size * 0.45,
             fontWeight: 800,
-            color: "#3b82f6",
+            color: "primary.main",
             letterSpacing: 0.5,
             userSelect: "none",
-            lineHeight: 1,        // tránh chữ tụt xuống
+            lineHeight: 1, // tránh chữ tụt xuống
             fontFamily: "Poppins, Inter, sans-serif",
           }}
         >
