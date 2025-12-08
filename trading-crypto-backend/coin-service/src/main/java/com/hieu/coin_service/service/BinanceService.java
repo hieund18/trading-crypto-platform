@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 public class BinanceService {
     BinanceClient binanceClient;
 
-    public BinanceExchangeInfoResponse getCoinSymbol(){
+    public BinanceExchangeInfoResponse getCoinSymbol() {
         var response = binanceClient.exchangeInfo();
 
         log.info("Binance coin response: {}", response);
@@ -25,7 +25,7 @@ public class BinanceService {
         return response;
     }
 
-    public BinanceSymbolPriceResponse getPrice(String symbol){
+    public BinanceSymbolPriceResponse getPrice(String symbol) {
         var response = binanceClient.getPrice(symbol);
 
         log.info("Binance price: {}", response);
@@ -33,11 +33,11 @@ public class BinanceService {
         return response;
     }
 
-    public boolean isSymbolSupported(String symbol){
+    public boolean isSymbolSupported(String symbol) {
         try {
             var response = binanceClient.getPrice(symbol);
             return response != null;
-        }catch (FeignException exception){
+        } catch (FeignException exception) {
             return false;
         }
     }

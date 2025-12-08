@@ -21,6 +21,7 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import MainLayout from "../../components/layout/MainLayout";
 import WithdrawDialog from "../../components/wallet/WithdrawDialog";
 import TransferDialog from "../../components/wallet/TransferDialog";
+import DepositDialog from "../../components/wallet/DepositDialog";
 
 import { getMyWalletApi, getMyWalletTransactionApi } from "../../api/walletApi";
 import { formatPrice } from "../../utils/formatters";
@@ -69,6 +70,7 @@ export default function WalletPage() {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showBalance, setShowBalance] = useState(true);
+  const [openDeposit, setOpenDeposit] = useState(false);
   
   // 🔥 SỬA LOGIC XOAY: Dùng góc quay tích lũy để luôn quay tới
   const [rotation, setRotation] = useState(0); 
@@ -117,7 +119,13 @@ export default function WalletPage() {
       }
   };
 
-  const handleAction = (action) => toastInfo(`Tính năng ${action} đang phát triển!`);
+  const handleAction = (action) => {
+      if (action === "Nạp tiền") {
+          setOpenDeposit(true); // Mở modal
+      } else {
+          toastInfo(`Tính năng ${action} đang phát triển!`);
+      }
+  };
 
   // --- STYLE CHUNG ---
   const headerSx = { color: TEXT_HEAD_COLOR, fontWeight: 600, fontSize: 13 };
@@ -364,6 +372,12 @@ export default function WalletPage() {
                 </Table>
             </TableContainer>
         </Paper>
+
+        <DepositDialog 
+            open={openDeposit}
+            onClose={() => setOpenDeposit(false)}
+            onSuccess={fetchWalletData} // Refresh lại số dư sau khi nạp
+        />
 
         <WithdrawDialog 
             open={openWithdraw}

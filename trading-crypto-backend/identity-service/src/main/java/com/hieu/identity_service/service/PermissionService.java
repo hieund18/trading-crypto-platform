@@ -15,7 +15,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -48,18 +47,18 @@ public class PermissionService {
 
     public PageResponse<PermissionResponse> searchByName(String keyword, Pageable pageable) {
 
-//        Sort sort = Sort.by("name").ascending();
+        //        Sort sort = Sort.by("name").ascending();
         Pageable pageRequest = PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize(), pageable.getSort());
 
         var pageData = permissionRepository.findByNameContainingIgnoreCase(keyword, pageRequest);
 
-//        return PageResponse.<PermissionResponse>builder()
-//                .currentPage(pageableDefault.page())
-//                .sizePage(pageData.getSize())
-//                .totalPages(pageData.getTotalPages())
-//                .totalElements(pageData.getTotalElements())
-//                .data(pageData.getContent().stream().map(permissionMapper::toPermissionResponse).toList())
-//                .build();
+        //        return PageResponse.<PermissionResponse>builder()
+        //                .currentPage(pageableDefault.page())
+        //                .sizePage(pageData.getSize())
+        //                .totalPages(pageData.getTotalPages())
+        //                .totalElements(pageData.getTotalElements())
+        //                .data(pageData.getContent().stream().map(permissionMapper::toPermissionResponse).toList())
+        //                .build();
 
         return PageResponse.fromPage(pageData.map(permissionMapper::toPermissionResponse));
     }

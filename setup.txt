@@ -1,0 +1,43 @@
+
+tao thu muc luu du lieu db:
+sudo mkdir -p /opt/db/data/{mysql,mongo,redis,kafka}
+(xoa: 
+sudo rm -rf /opt/db/data/mysql
+sudo rm -rf /opt/db/data/mongo
+sudo rm -rf /opt/db/data/redis
+sudo rm -rf /opt/db/data/kafka
+)
+
+cap quyen ghi cho kafka:
+sudo chown -R 1000:1000 /opt/db/data/kafka
+sudo chmod -R 775 /opt/db/data/kafka
+
+tao file docker compose tao db:
+sudo nano /opt/db/docker-compose.yml
+(xoa: 
+sudo rm -f /opt/db/docker-compose.yml
+)
+
+chay docker
+cd /opt/db
+sudo docker compose up -d
+(down: 
+sudo docker compose down
+)
+
+
+tao port forwarding de ket noi local (dung termius):
+mysql:
+Name: mysql
+Type: Local
+Local Port: 3306
+Remote Host: localhost
+Remote Port: 3306
+
+mongdb:
+Local Port: 27017
+Remote Port: 27017
+
+redis:
+Local Port: 6379
+Remote Port: 6379

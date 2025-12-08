@@ -3,7 +3,7 @@ import React from "react";
 import {
   Box, Avatar, Menu, MenuItem, Divider, ListItemIcon, Typography, IconButton
 } from "@mui/material";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { logoutApi } from "../../api/authApi";
 import { getRefreshToken } from "../../api/tokenUtils";
@@ -37,6 +37,21 @@ export default function UserMenu() {
   const displayName = user.profile?.fullName || user.username;
   const displayAvatar = user.profile?.avatar;
 
+  // 🔥 STYLE ĐỒNG BỘ VỚI ADMIN & SIDEBAR
+  const menuItemSx = {
+    mx: 1, 
+    mb: 0.5, 
+    borderRadius: 1, 
+    color: "text.secondary",
+    "& .MuiListItemIcon-root": { color: "inherit", minWidth: 36 },
+    "&:hover": { 
+        bgcolor: "action.hover", 
+        color: "text.primary" 
+    },
+    transition: "all 0.2s",
+    py: 1.2
+  };
+
   return (
     <Box sx={{ display: "inline-block" }}>
       <IconButton onClick={handleOpenMenu} sx={{ p: 0 }}>
@@ -53,10 +68,10 @@ export default function UserMenu() {
           sx: { 
             width: 260, 
             borderRadius: 2, 
-            bgcolor: "background.popup", // 🔥 SỬ DỤNG MÀU MỚI (Admin/User Menu sẽ giống màu Dialog)
-            border: "1px solid", 
-            borderColor: "divider", 
-            mt: 1.5 
+            mt: 1.5,
+            border: "1px solid",
+            borderColor: "divider",
+            // bgcolor: "background.popup" (đã có trong theme)
           },
         }}
       >
@@ -68,27 +83,28 @@ export default function UserMenu() {
           </Box>
         </Box>
 
-        <Divider />
+        <Divider sx={{ mb: 1 }} />
 
-        <MenuItem component={Link} to="/portfolio" onClick={handleClose}>
+        <MenuItem component={Link} to="/portfolio" onClick={handleClose} sx={menuItemSx}>
           <ListItemIcon><TrendingUpOutlinedIcon fontSize="small" /></ListItemIcon>
           Danh mục đầu tư
         </MenuItem>
 
-        <MenuItem component={Link} to="/wallet" onClick={handleClose}>
+        <MenuItem component={Link} to="/wallet" onClick={handleClose} sx={menuItemSx}>
           <ListItemIcon><AccountBalanceWalletOutlinedIcon fontSize="small" /></ListItemIcon>
           Ví của tôi
         </MenuItem>
 
-        <MenuItem component={Link} to="/settings" onClick={handleClose}>
+        <MenuItem component={Link} to="/settings" onClick={handleClose} sx={menuItemSx}>
           <ListItemIcon><SettingsOutlinedIcon fontSize="small" /></ListItemIcon>
           Cài đặt
         </MenuItem>
 
-        <Divider />
+        <Divider sx={{ my: 1 }} />
 
-        <MenuItem onClick={handleLogout} sx={{ color: "error.main" }}>
-          <ListItemIcon><LogoutOutlinedIcon fontSize="small" color="error" /></ListItemIcon>
+        {/* 🔥 Đăng xuất cũng dùng style thường, không đỏ */}
+        <MenuItem onClick={handleLogout} sx={menuItemSx}>
+          <ListItemIcon><LogoutOutlinedIcon fontSize="small" /></ListItemIcon>
           Đăng xuất
         </MenuItem>
       </Menu>

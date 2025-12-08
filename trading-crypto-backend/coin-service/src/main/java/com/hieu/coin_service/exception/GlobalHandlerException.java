@@ -1,5 +1,8 @@
 package com.hieu.coin_service.exception;
 
+import java.util.Map;
+import java.util.Objects;
+
 import com.hieu.coin_service.dto.ApiResponse;
 import jakarta.validation.ConstraintViolation;
 import lombok.extern.slf4j.Slf4j;
@@ -9,9 +12,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.util.Map;
-import java.util.Objects;
-
 @ControllerAdvice
 @Slf4j
 public class GlobalHandlerException {
@@ -20,36 +20,33 @@ public class GlobalHandlerException {
         log.info("Exception", exception);
         ErrorCode errorCode = ErrorCode.UNCATEGORIZED_EXCEPTION;
 
-        return ResponseEntity.status(errorCode.getStatusCode()).body(
-                ApiResponse.builder()
+        return ResponseEntity.status(errorCode.getStatusCode())
+                .body(ApiResponse.builder()
                         .code(errorCode.getCode())
                         .message(errorCode.getMessage())
-                        .build()
-        );
+                        .build());
     }
 
     @ExceptionHandler(value = AppException.class)
     ResponseEntity<ApiResponse> handlingAppException(AppException exception) {
         ErrorCode errorCode = exception.getErrorCode();
 
-        return ResponseEntity.status(errorCode.getStatusCode()).body(
-                ApiResponse.builder()
+        return ResponseEntity.status(errorCode.getStatusCode())
+                .body(ApiResponse.builder()
                         .code(errorCode.getCode())
                         .message(errorCode.getMessage())
-                        .build()
-        );
+                        .build());
     }
 
     @ExceptionHandler(value = AccessDeniedException.class)
     ResponseEntity<ApiResponse> handlingAccessDeniedException(AccessDeniedException exception) {
         ErrorCode errorCode = ErrorCode.UNAUTHORIZED;
 
-        return ResponseEntity.status(errorCode.getStatusCode()).body(
-                ApiResponse.builder()
+        return ResponseEntity.status(errorCode.getStatusCode())
+                .body(ApiResponse.builder()
                         .code(errorCode.getCode())
                         .message(errorCode.getMessage())
-                        .build()
-        );
+                        .build());
     }
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
@@ -62,22 +59,22 @@ public class GlobalHandlerException {
         try {
             errorCode = ErrorCode.valueOf(enumKey);
 
-            var constraintViolation = exception.getBindingResult()
-                    .getAllErrors().get(0).unwrap(ConstraintViolation.class);
+            var constraintViolation =
+                    exception.getBindingResult().getAllErrors().get(0).unwrap(ConstraintViolation.class);
 
             attributes = constraintViolation.getConstraintDescriptor().getAttributes();
         } catch (IllegalArgumentException e) {
 
         }
 
-        return ResponseEntity.status(errorCode.getStatusCode()).body(
-                ApiResponse.builder()
+        return ResponseEntity.status(errorCode.getStatusCode())
+                .body(ApiResponse.builder()
                         .code(errorCode.getCode())
-                        .message(Objects.nonNull(attributes)
-                                ? mapAttributes(errorCode.getMessage(), attributes)
-                                : errorCode.getMessage())
-                        .build()
-        );
+                        .message(
+                                Objects.nonNull(attributes)
+                                        ? mapAttributes(errorCode.getMessage(), attributes)
+                                        : errorCode.getMessage())
+                        .build());
     }
 
     private String mapAttributes(String message, Map<String, Object> attributes) {
@@ -90,5 +87,4 @@ public class GlobalHandlerException {
 
         return message;
     }
-
 }

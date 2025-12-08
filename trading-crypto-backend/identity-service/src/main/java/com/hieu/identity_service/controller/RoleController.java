@@ -31,8 +31,7 @@ public class RoleController {
     @GetMapping
     ApiResponse<PageResponse<RoleResponse>> getRoles(
             @RequestParam(required = false, defaultValue = "") String name,
-            @PageableDefault(page = 1, sort = "name", direction = Sort.Direction.ASC) Pageable pageable
-    ) {
+            @PageableDefault(page = 1, sort = "name", direction = Sort.Direction.ASC) Pageable pageable) {
         return ApiResponse.<PageResponse<RoleResponse>>builder()
                 .result(roleService.getRoles(name, pageable))
                 .build();
@@ -51,5 +50,4 @@ public class RoleController {
 
         return ApiResponse.<Void>builder().build();
     }
-
 }

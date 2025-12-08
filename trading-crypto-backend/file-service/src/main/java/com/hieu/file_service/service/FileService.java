@@ -1,7 +1,9 @@
 package com.hieu.file_service.service;
 
-import com.hieu.file_service.constant.FileType;
+import java.io.IOException;
+
 import com.hieu.file_service.constant.AccessScope;
+import com.hieu.file_service.constant.FileType;
 import com.hieu.file_service.dto.FileInfo;
 import com.hieu.file_service.dto.response.FileData;
 import com.hieu.file_service.dto.response.FileResponse;
@@ -19,8 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
@@ -55,7 +55,8 @@ public class FileService {
     }
 
     public FileData downloadFile(String fileName) throws IOException {
-        FileManagement fileManagement = fileManagementRepository.findById(fileName)
+        FileManagement fileManagement = fileManagementRepository
+                .findById(fileName)
                 .orElseThrow(() -> new AppException(ErrorCode.FILE_NOT_FOUND));
 
         var resource = fileRepository.read(fileManagement);
@@ -93,24 +94,23 @@ public class FileService {
     }
 
     public FileResponse getUrlAWS(String key) {
-        FileManagement fileManagement = fileManagementRepository.findByPath(key)
-                .orElseThrow(() -> new AppException(ErrorCode.FILE_NOT_FOUND));
+        FileManagement fileManagement =
+                fileManagementRepository.findByPath(key).orElseThrow(() -> new AppException(ErrorCode.FILE_NOT_FOUND));
 
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
         String accessLevel = fileManagement.getAccessLevel();
 
-        if (accessLevel.equals(AccessScope.PRIVATE.name()) && !fileManagement.getOwnerId().equals(userId))
-            throw new AppException(ErrorCode.UNAUTHORIZED);
+        if (accessLevel.equals(AccessScope.PRIVATE.name())
+                && !fileManagement.getOwnerId().equals(userId)) throw new AppException(ErrorCode.UNAUTHORIZED);
 
-        String url = switch (accessLevel) {
-            case "PUBLIC" -> awsS3Service.getUrl(fileManagement);
-            default -> awsS3Service.getPresignedUrl(fileManagement);
-        };
+        String url =
+                switch (accessLevel) {
+                    case "PUBLIC" -> awsS3Service.getUrl(fileManagement);
+                    default -> awsS3Service.getPresignedUrl(fileManagement);
+                };
 
-        return FileResponse.builder()
-                .url(url)
-                .build();
+        return FileResponse.builder().url(url).build();
     }
 
     public void updateAccessLevelAWS(String fileName, String accessLevel) {
@@ -120,17 +120,16 @@ public class FileService {
             throw new AppException(ErrorCode.INVALID_ACCESS_LEVEL);
         }
 
-        FileManagement fileManagement = fileManagementRepository.findById(fileName)
+        FileManagement fileManagement = fileManagementRepository
+                .findById(fileName)
                 .orElseThrow(() -> new AppException(ErrorCode.FILE_NOT_FOUND));
 
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         var userId = authentication.getName();
 
-        if (!userId.equals(fileManagement.getOwnerId()))
-            throw new AppException(ErrorCode.UNAUTHORIZED);
+        if (!userId.equals(fileManagement.getOwnerId())) throw new AppException(ErrorCode.UNAUTHORIZED);
 
-        if (fileManagement.getAccessLevel().equals(accessLevel))
-            return;
+        if (fileManagement.getAccessLevel().equals(accessLevel)) return;
 
         var fileInfo = awsS3Service.copyFile(fileManagement, accessLevel);
 
@@ -142,7 +141,8 @@ public class FileService {
     }
 
     public void deleteFileAWS(String path) {
-        FileManagement fileManagement = fileManagementRepository.findByPath(path).orElse(null);
+        FileManagement fileManagement =
+                fileManagementRepository.findByPath(path).orElse(null);
 
         if (fileManagement != null) {
             awsS3Service.deleteFile(fileManagement);

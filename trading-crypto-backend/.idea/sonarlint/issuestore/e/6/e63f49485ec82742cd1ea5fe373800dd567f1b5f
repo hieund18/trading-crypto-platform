@@ -1,65 +1,69 @@
 
-h	java:S112²"FDefine and throw a dedicated exception instead of using a generic one.(Ò‚Òéüÿÿÿÿ8Êò°‘¨3
+h	java:S112¿"FDefine and throw a dedicated exception instead of using a generic one.(Ò‚Òéüÿÿÿÿ8Êò°‘¨3
 k
-java:S1192­"NDefine a constant instead of duplicating this literal "User info: {}" 4 times.(„§¹8Ìò°‘¨3
+java:S1192®"NDefine a constant instead of duplicating this literal "User info: {}" 4 times.(„§¹8Ìò°‘¨3
 e
-java:S1192û"HDefine a constant instead of duplicating this literal "Bearer " 3 times.(¢ÓÒ
+java:S1192‚"HDefine a constant instead of duplicating this literal "Bearer " 3 times.(¢ÓÒ
 8Íò°‘¨3
 F
-java:S5411ï"(Use a primitive boolean expression here.(Îë¢8—õ™†©3
-q	java:S116C"URename this field "SIGNER_KEY" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ëü§™8…ó°‘¨3
-u	java:S116G"YRename this field "VALID_DURATION" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ˆçï˜8…ó°‘¨3
-{	java:S116K"_Rename this field "REFRESHABLE_DURATION" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(µĞ²8…ó°‘¨3
-|	java:S116O"[Rename this field "GOOGLE_CLIENT_ID" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(°ˆûÚùÿÿÿÿ8…ó°‘¨3
-€	java:S116S"_Rename this field "GOOGLE_CLIENT_SECRET" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(­øÌÎşÿÿÿÿ8…ó°‘¨3
-s	java:S116W"WRename this field "REDIRECT_URI" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ë“ëÍ8…ó°‘¨3
-q	java:S116Z"URename this field "GRANT_TYPE" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ã¦ùÁ8…ó°‘¨3
-|	java:S116^"[Rename this field "GITHUB_CLIENT_ID" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÌúŸüÿÿÿÿ8…ó°‘¨3
-{	java:S116b"_Rename this field "GITHUB_CLIENT_SECRET" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(š³¤È8…ó°‘¨3
+java:S5411ü"(Use a primitive boolean expression here.(Îë¢8—õ™†©3
+q	java:S116D"URename this field "SIGNER_KEY" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ëü§™8…ó°‘¨3
+u	java:S116H"YRename this field "VALID_DURATION" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ˆçï˜8…ó°‘¨3
+{	java:S116L"_Rename this field "REFRESHABLE_DURATION" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(µĞ²8…ó°‘¨3
+|	java:S116P"[Rename this field "GOOGLE_CLIENT_ID" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(°ˆûÚùÿÿÿÿ8…ó°‘¨3
+€	java:S116T"_Rename this field "GOOGLE_CLIENT_SECRET" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(­øÌÎşÿÿÿÿ8…ó°‘¨3
+s	java:S116X"WRename this field "REDIRECT_URI" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ë“ëÍ8…ó°‘¨3
+q	java:S116["URename this field "GRANT_TYPE" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ã¦ùÁ8…ó°‘¨3
+|	java:S116_"[Rename this field "GITHUB_CLIENT_ID" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÌúŸüÿÿÿÿ8…ó°‘¨3
+{	java:S116c"_Rename this field "GITHUB_CLIENT_SECRET" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(š³¤È8…ó°‘¨3
 >
-java:S1170Z"!Make this final field static too.(Ã¦ùÁ8…ó°‘¨3
+java:S1170["!Make this final field static too.(Ã¦ùÁ8…ó°‘¨3
 a
-java:S1854y"?Remove this useless assignment to local variable "otpResponse".(¡ÙÉÍşÿÿÿÿ8Œó°‘¨3
+java:S1854z"?Remove this useless assignment to local variable "otpResponse".(¡ÙÉÍşÿÿÿÿ8Œó°‘¨3
 b
-java:S1854‹"?Remove this useless assignment to local variable "otpResponse".(¡ÙÉÍşÿÿÿÿ8”ó°‘¨3
+java:S1854Œ"?Remove this useless assignment to local variable "otpResponse".(¡ÙÉÍşÿÿÿÿ8”ó°‘¨3
 R
-java:S1481y"0Remove this unused "otpResponse" local variable.(¡ÙÉÍşÿÿÿÿ8‘ó°‘¨3
-^	java:S125Š"<This block of commented-out lines of code should be removed.(ñ¥ùšøÿÿÿÿ8‘ó°‘¨3
+java:S1481z"0Remove this unused "otpResponse" local variable.(¡ÙÉÍşÿÿÿÿ8‘ó°‘¨3
+^	java:S125‹"<This block of commented-out lines of code should be removed.(ñ¥ùšøÿÿÿÿ8‘ó°‘¨3
 S
-java:S1481‹"0Remove this unused "otpResponse" local variable.(¡ÙÉÍşÿÿÿÿ8ó°‘¨3
-^	java:S125"<This block of commented-out lines of code should be removed.(ÄËŒ«úÿÿÿÿ8’ó°‘¨3
+java:S1481Œ"0Remove this unused "otpResponse" local variable.(¡ÙÉÍşÿÿÿÿ8ó°‘¨3
+^	java:S125‘"<This block of commented-out lines of code should be removed.(ÄËŒ«úÿÿÿÿ8’ó°‘¨3
 b
-java:S1854Û"?Remove this useless assignment to local variable "otpResponse".(¡ÙÉÍşÿÿÿÿ8Ÿó°‘¨3
-^	java:S125Ú"<This block of commented-out lines of code should be removed.(ñ¥ùšøÿÿÿÿ8ó°‘¨3
+java:S1854â"?Remove this useless assignment to local variable "otpResponse".(¡ÙÉÍşÿÿÿÿ8Ÿó°‘¨3
+V
+java:S1481Ï"3Remove this unused "walletResponse" local variable.(íùÁşÿÿÿÿ8ÍÆü×­3
+^	java:S125á"<This block of commented-out lines of code should be removed.(ñ¥ùšøÿÿÿÿ8ó°‘¨3
 S
-java:S1481Û"0Remove this unused "otpResponse" local variable.(¡ÙÉÍşÿÿÿÿ8§ó°‘¨3
-^	java:S125Ü"<This block of commented-out lines of code should be removed.(ÄËŒ«úÿÿÿÿ8ó°‘¨3
+java:S1481â"0Remove this unused "otpResponse" local variable.(¡ÙÉÍşÿÿÿÿ8§ó°‘¨3
+^	java:S125ã"<This block of commented-out lines of code should be removed.(ÄËŒ«úÿÿÿÿ8ó°‘¨3
 b
-java:S1854³"?Remove this useless assignment to local variable "otpResponse".(¡ÙÉÍşÿÿÿÿ8–ú™†©3
-^	java:S125²"<This block of commented-out lines of code should be removed.(ñ¥ùšøÿÿÿÿ8§ó°‘¨3
+java:S1854À"?Remove this useless assignment to local variable "otpResponse".(¡ÙÉÍşÿÿÿÿ8–ú™†©3
+V
+java:S1481®"3Remove this unused "walletResponse" local variable.(íùÁşÿÿÿÿ8®ÆıÙ­3
+^	java:S125¿"<This block of commented-out lines of code should be removed.(ñ¥ùšøÿÿÿÿ8§ó°‘¨3
 S
-java:S1481³"0Remove this unused "otpResponse" local variable.(¡ÙÉÍşÿÿÿÿ8Òú™†©3
-^	java:S125´"<This block of commented-out lines of code should be removed.(ÄËŒ«úÿÿÿÿ8¨ó°‘¨3
-^	java:S125›"<This block of commented-out lines of code should be removed.(ñ¥ùšøÿÿÿÿ8²ó°‘¨3
+java:S1481À"0Remove this unused "otpResponse" local variable.(¡ÙÉÍşÿÿÿÿ8Òú™†©3
+^	java:S125Á"<This block of commented-out lines of code should be removed.(ÄËŒ«úÿÿÿÿ8¨ó°‘¨3
+^	java:S125¨"<This block of commented-out lines of code should be removed.(ñ¥ùšøÿÿÿÿ8²ó°‘¨3
 _
-java:S1854Í"<Remove this useless assignment to local variable "response".(ÀÓƒêùÿÿÿÿ8¶ó°‘¨3
-^	java:S125Ì"<This block of commented-out lines of code should be removed.(ñ¥ùšøÿÿÿÿ8·ó°‘¨3
+java:S1854Ú"<Remove this useless assignment to local variable "response".(ÀÓƒêùÿÿÿÿ8¶ó°‘¨3
+^	java:S125Ù"<This block of commented-out lines of code should be removed.(ñ¥ùšøÿÿÿÿ8·ó°‘¨3
 P
-java:S1481Í"-Remove this unused "response" local variable.(ÀÓƒêùÿÿÿÿ8¸ó°‘¨3
-^	java:S125Î"<This block of commented-out lines of code should be removed.(ÄËŒ«úÿÿÿÿ8¸ó°‘¨3
+java:S1481Ú"-Remove this unused "response" local variable.(ÀÓƒêùÿÿÿÿ8¸ó°‘¨3
+^	java:S125Û"<This block of commented-out lines of code should be removed.(ÄËŒ«úÿÿÿÿ8¸ó°‘¨3
 ]
-java:S1854ä"?Remove this useless assignment to local variable "responseOtp".(úÕ™8ºó°‘¨3
-^	java:S125ã"<This block of commented-out lines of code should be removed.(ñ¥ùšøÿÿÿÿ8¼ó°‘¨3
+java:S1854ñ"?Remove this useless assignment to local variable "responseOtp".(úÕ™8ºó°‘¨3
+^	java:S125ğ"<This block of commented-out lines of code should be removed.(ñ¥ùšøÿÿÿÿ8¼ó°‘¨3
 N
-java:S1481ä"0Remove this unused "responseOtp" local variable.(úÕ™8½ó°‘¨3
-^	java:S125å"<This block of commented-out lines of code should be removed.(ÄËŒ«úÿÿÿÿ8½ó°‘¨3
-^	java:S125õ"<This block of commented-out lines of code should be removed.(ñ¥ùšøÿÿÿÿ8û™†©3
-^	java:S125ø"<This block of commented-out lines of code should be removed.(ÄËŒ«úÿÿÿÿ8 û™†©3
+java:S1481ñ"0Remove this unused "responseOtp" local variable.(úÕ™8½ó°‘¨3
+^	java:S125ò"<This block of commented-out lines of code should be removed.(ÄËŒ«úÿÿÿÿ8½ó°‘¨3
+^	java:S125‚"<This block of commented-out lines of code should be removed.(ñ¥ùšøÿÿÿÿ8û™†©3
+^	java:S125…"<This block of commented-out lines of code should be removed.(ÄËŒ«úÿÿÿÿ8 û™†©3
 _
-java:S1854ˆ"<Remove this useless assignment to local variable "response".(ÀÓƒêùÿÿÿÿ8¡û™†©3
-^	java:S125‡"<This block of commented-out lines of code should be removed.(ñ¥ùšøÿÿÿÿ8§û™†©3
+java:S1854•"<Remove this useless assignment to local variable "response".(ÀÓƒêùÿÿÿÿ8¡û™†©3
+^	java:S125”"<This block of commented-out lines of code should be removed.(ñ¥ùšøÿÿÿÿ8§û™†©3
 P
-java:S1481ˆ"-Remove this unused "response" local variable.(ÀÓƒêùÿÿÿÿ8©û™†©3
-^	java:S125‰"<This block of commented-out lines of code should be removed.(ÄËŒ«úÿÿÿÿ8ªû™†©3
-^	java:S125Ü"<This block of commented-out lines of code should be removed.(İ¦Ç™üÿÿÿÿ8Ïó°‘¨3
-^	java:S125è"<This block of commented-out lines of code should be removed.(Â·Šâüÿÿÿÿ8³»¥”¨3
+java:S1481•"-Remove this unused "response" local variable.(ÀÓƒêùÿÿÿÿ8©û™†©3
+^	java:S125–"<This block of commented-out lines of code should be removed.(ÄËŒ«úÿÿÿÿ8ªû™†©3
+^	java:S125é"<This block of commented-out lines of code should be removed.(İ¦Ç™üÿÿÿÿ8Ïó°‘¨3
+^	java:S125õ"<This block of commented-out lines of code should be removed.(Â·Šâüÿÿÿÿ8³»¥”¨3

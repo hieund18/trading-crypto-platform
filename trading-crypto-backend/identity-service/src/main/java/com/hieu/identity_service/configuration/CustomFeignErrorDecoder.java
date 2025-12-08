@@ -1,5 +1,7 @@
 package com.hieu.identity_service.configuration;
 
+import java.io.IOException;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hieu.identity_service.dto.ApiResponse;
 import com.hieu.identity_service.exception.AppException;
@@ -8,8 +10,6 @@ import feign.Response;
 import feign.Util;
 import feign.codec.ErrorDecoder;
 import lombok.extern.slf4j.Slf4j;
-
-import java.io.IOException;
 
 @Slf4j
 public class CustomFeignErrorDecoder implements ErrorDecoder {
@@ -21,8 +21,8 @@ public class CustomFeignErrorDecoder implements ErrorDecoder {
             String body = Util.toString(response.body().asReader());
             log.info("Body: {}", body);
 
-//            JsonNode node = objectMapper.readTree(body);
-//            int code = node.get("code").asInt();
+            //            JsonNode node = objectMapper.readTree(body);
+            //            int code = node.get("code").asInt();
 
             ApiResponse<?> apiResponse = objectMapper.readValue(body, ApiResponse.class);
 

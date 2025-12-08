@@ -1,5 +1,7 @@
 package com.hieu.coin_service.controller;
 
+import java.util.List;
+
 import com.hieu.coin_service.dto.ApiResponse;
 import com.hieu.coin_service.dto.response.CoinResponse;
 import com.hieu.coin_service.service.WatchlistService;
@@ -7,8 +9,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/watchlists")

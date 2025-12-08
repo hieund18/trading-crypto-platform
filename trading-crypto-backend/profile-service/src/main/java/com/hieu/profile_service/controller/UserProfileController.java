@@ -1,5 +1,7 @@
 package com.hieu.profile_service.controller;
 
+import java.util.List;
+
 import com.hieu.profile_service.dto.ApiResponse;
 import com.hieu.profile_service.dto.PageResponse;
 import com.hieu.profile_service.dto.request.ProfileUpdateRequest;
@@ -24,8 +26,8 @@ public class UserProfileController {
 
     @GetMapping
     ApiResponse<PageResponse<UserProfileResponse>> getAllProfiles(
-            @PageableDefault(page = 1, size = 10, sort = "fullName", direction = Sort.Direction.ASC) Pageable pageable
-    ) {
+            @PageableDefault(page = 1, size = 10, sort = "fullName", direction = Sort.Direction.ASC)
+                    Pageable pageable) {
         return ApiResponse.<PageResponse<UserProfileResponse>>builder()
                 .result(userProfileService.getAllProfiles(pageable))
                 .build();
@@ -46,9 +48,16 @@ public class UserProfileController {
     }
 
     @PutMapping("/avatar")
-    ApiResponse<UserProfileResponse> updateAvatar(@RequestParam("file") MultipartFile file){
+    ApiResponse<UserProfileResponse> updateAvatar(@RequestParam("file") MultipartFile file) {
         return ApiResponse.<UserProfileResponse>builder()
                 .result(userProfileService.updateAvatar(file))
+                .build();
+    }
+
+    @GetMapping("/batch")
+    ApiResponse<List<UserProfileResponse>> getProfilesByUserIds(@RequestParam("userIds") List<String> userIds) {
+        return ApiResponse.<List<UserProfileResponse>>builder()
+                .result(userProfileService.getProfilesByUserIds(userIds))
                 .build();
     }
 }

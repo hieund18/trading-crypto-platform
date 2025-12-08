@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(name = "profile-service", url = "${app.services.profile}",
+@FeignClient(
+        name = "profile-service",
+        url = "${app.services.profile}",
         configuration = {CustomFeignErrorDecoder.class})
 public interface ProfileClient {
     @PostMapping(value = "/internal/users", produces = MediaType.APPLICATION_JSON_VALUE)

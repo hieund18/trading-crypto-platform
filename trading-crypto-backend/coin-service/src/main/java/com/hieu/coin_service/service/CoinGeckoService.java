@@ -1,5 +1,7 @@
 package com.hieu.coin_service.service;
 
+import java.util.List;
+
 import com.hieu.coin_service.dto.response.*;
 import com.hieu.coin_service.repository.httpclient.CoinGeckoClient;
 import lombok.AccessLevel;
@@ -9,8 +11,6 @@ import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -52,7 +52,7 @@ public class CoinGeckoService {
         return response;
     }
 
-    public List<CoinGeckoMasterResponse> getAllCoins(){
+    public List<CoinGeckoMasterResponse> getAllCoins() {
         var response = coinGeckoClient.getAllCoins(apiKey);
 
         log.info("List coin: {}", response);

@@ -13,9 +13,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private static final String[] PUBLIC_ENDPOINTS = {
-            "/media/upload", "/media/download/**", "/media/upload/**"
-    };
+    private static final String[] PUBLIC_ENDPOINTS = {"/media/upload", "/media/download/**", "/media/upload/**"};
 
     private final CustomJwtDecoder customJwtDecoder;
 

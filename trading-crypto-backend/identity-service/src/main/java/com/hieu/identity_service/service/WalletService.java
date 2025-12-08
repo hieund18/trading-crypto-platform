@@ -17,12 +17,12 @@ import org.springframework.stereotype.Service;
 public class WalletService {
     WalletClient walletClient;
 
-    public ApiResponse<WalletResponse> createWallet(WalletCreationRequest request){
+    public ApiResponse<WalletResponse> createWallet(WalletCreationRequest request) {
         log.info("Calling create wallet");
         return walletClient.createWallet(request);
     }
 
-    public ApiResponse<Void> deleteWalletByUserId(String userId){
+    public ApiResponse<Void> deleteWalletByUserId(String userId) {
         log.info("Calling delete wallet");
         return walletClient.deleteWalletByUserId(userId);
     }

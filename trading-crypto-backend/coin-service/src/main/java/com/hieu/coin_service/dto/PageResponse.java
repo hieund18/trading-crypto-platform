@@ -1,11 +1,11 @@
 package com.hieu.coin_service.dto;
 
+import java.util.Collections;
+import java.util.List;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
-
-import java.util.Collections;
-import java.util.List;
 
 @Data
 @Builder
@@ -22,10 +22,7 @@ public class PageResponse<T> {
     List<T> content = Collections.emptyList();
 
     public static <T> PageResponse<T> fromPage(Page<T> page) {
-        return new PageResponse<>(page.getNumber() + 1,
-                page.getSize(),
-                page.getTotalPages(),
-                page.getTotalElements(),
-                page.getContent());
+        return new PageResponse<>(
+                page.getNumber() + 1, page.getSize(), page.getTotalPages(), page.getTotalElements(), page.getContent());
     }
 }

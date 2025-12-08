@@ -22,7 +22,6 @@ public enum ErrorCode {
     CANNOT_GET_URL(4106, "Cannot get url", HttpStatus.INTERNAL_SERVER_ERROR),
     CANNOT_UPDATE_ACCESS_LEVEL(4107, "Cannot update access level", HttpStatus.INTERNAL_SERVER_ERROR),
     CANNOT_DELETE_FILE(4108, "Cannot delete file", HttpStatus.INTERNAL_SERVER_ERROR),
-
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

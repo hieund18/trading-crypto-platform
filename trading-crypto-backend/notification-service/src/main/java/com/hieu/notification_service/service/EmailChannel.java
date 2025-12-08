@@ -20,9 +20,7 @@ public class EmailChannel implements NotificationChannel {
         SendEmailRequest sendEmailRequest = SendEmailRequest.builder()
                 .value(request.getContent())
                 .subject(request.getSubject())
-                .to(Recipient.builder()
-                        .email(request.getRecipient())
-                        .build())
+                .to(Recipient.builder().email(request.getRecipient()).build())
                 .build();
 
         emailService.sendEmail(sendEmailRequest);

@@ -1,11 +1,11 @@
 package com.hieu.profile_service.entity;
 
+import java.time.LocalDate;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
-
-import java.time.LocalDate;
 
 @Getter
 @Setter

@@ -30,6 +30,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -79,6 +80,15 @@ public class WalletService {
 
         Pageable pageRequest = PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize(), pageable.getSort());
         var pageData = walletTransactionRepository.findAllByUserIdAndType(pageRequest, userId, type);
+
+        return PageResponse.fromPage(pageData.map(walletTransactionMapper::toWalletTransactionResponse));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    public PageResponse<WalletTransactionResponse> getTransactions(String keyword, String type, Pageable pageable){
+        Pageable pageRequest = PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize(), pageable.getSort());
+
+        var pageData = walletTransactionRepository.searchTransactions(pageRequest, keyword, type);
 
         return PageResponse.fromPage(pageData.map(walletTransactionMapper::toWalletTransactionResponse));
     }
@@ -206,14 +216,16 @@ public class WalletService {
         return PageResponse.fromPage(pageData.map(withdrawalMapper::toWithdrawalResponse));
     }
 
-    public PageResponse<WithdrawalResponse> getWithdrawals(Pageable pageable) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public PageResponse<WithdrawalResponse> getWithdrawals(String keyword, String status, Pageable pageable) {
         Pageable pageRequest = PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize(), pageable.getSort());
 
-        var pageData = withdrawalRepository.findAllByStatusNot(WithdrawalStatus.PENDING_OTP.name(), pageRequest);
+        var pageData = withdrawalRepository.searchWithdrawals(pageRequest, WithdrawalStatus.PENDING_OTP.name(), status, keyword);
 
         return PageResponse.fromPage(pageData.map(withdrawalMapper::toWithdrawalResponse));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public WithdrawalResponse approveWithdraw(String withdrawalId) {
         Withdrawal withdrawal = withdrawalRepository.findById(withdrawalId)
                 .orElseThrow(() -> new AppException(ErrorCode.WITHDRAWAL_NOT_EXISTED));
@@ -228,6 +240,7 @@ public class WalletService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public WithdrawalResponse rejectWithdraw(String withdrawalId) {
         Withdrawal withdrawal = withdrawalRepository.findById(withdrawalId)
                 .orElseThrow(() -> new AppException(ErrorCode.WITHDRAWAL_NOT_EXISTED));

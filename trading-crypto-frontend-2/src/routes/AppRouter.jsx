@@ -26,10 +26,13 @@ import WatchlistPage from "../pages/watchlist/WatchlistPage";
 
 import SettingsPage from "../pages/settings/SettingsPage";
 
+import LeaderboardPage from "../pages/leaderboard/LeaderboardPage";
+
 // Admin Pages (IMPORT MỚI)
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import UserManagement from "../pages/admin/UserManagement";
 import CoinManagement from "../pages/admin/CoinManagement";
+import TransactionManagement from "../pages/admin/TransactionManagement";
 
 // Guards
 import AdminRoute from "./AdminRoute";
@@ -63,6 +66,7 @@ export default function AppRouter() {
       <Route path="/" element={<Home />} />
       <Route path="/markets" element={<MarketPage />} />
       <Route path="/trade/:id" element={<CoinDetailPage />} />
+      <Route path="/leaderboard" element={<LeaderboardPage />} />
 
       {/* --- USER ROUTES --- */}
       <Route path="/dashboard" element={<UserRoute><Dashboard /></UserRoute>} />
@@ -110,6 +114,15 @@ export default function AppRouter() {
           <AdminRoute>
             {/* 🔥 Truyền prop isAdmin để đổi Layout */}
             <SettingsPage isAdmin={true} />
+          </AdminRoute>
+        } 
+      />
+
+      <Route 
+        path="/admin/transactions" 
+        element={
+          <AdminRoute>
+            <TransactionManagement />
           </AdminRoute>
         } 
       />

@@ -31,8 +31,7 @@ public class PermissionController {
     @GetMapping
     ApiResponse<PageResponse<PermissionResponse>> getPermissions(
             @RequestParam(value = "page", defaultValue = "1") int page,
-            @RequestParam(value = "size", defaultValue = "10") int size
-    ) {
+            @RequestParam(value = "size", defaultValue = "10") int size) {
         return ApiResponse.<PageResponse<PermissionResponse>>builder()
                 .result(permissionService.getPermissions(page, size))
                 .build();
@@ -41,8 +40,7 @@ public class PermissionController {
     @GetMapping("/search")
     ApiResponse<PageResponse<PermissionResponse>> searchByName(
             @RequestParam(value = "keyword", defaultValue = "") String keyword,
-            @PageableDefault(page = 1, sort = "name", direction = Sort.Direction.ASC) Pageable pageable
-    ) {
+            @PageableDefault(page = 1, sort = "name", direction = Sort.Direction.ASC) Pageable pageable) {
         return ApiResponse.<PageResponse<PermissionResponse>>builder()
                 .result(permissionService.searchByName(keyword, pageable))
                 .build();

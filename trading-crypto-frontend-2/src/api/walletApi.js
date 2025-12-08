@@ -69,3 +69,43 @@ export async function verifyTransferOtpApi(transferId, otpCode) {
   });
   return res.data;
 }
+
+// 🔥 API ADMIN: Lấy toàn bộ lịch sử giao dịch hệ thống
+export async function getAllTransactionsApi(params = {}) {
+  // Endpoint: /wallet/wallets/transactions
+  // Params: page, size, keyword (userId/transId), type
+  const res = await api.get("/wallet/wallets/transactions", { params });
+  return res.data;
+}
+
+// 1. Lấy danh sách yêu cầu rút tiền (Admin)
+export async function getAllWithdrawalsApi(params = {}) {
+  // Endpoint: /wallet/wallets/withdraws
+  // Params: page, size, keyword, status
+  const res = await api.get("/wallet/wallets/withdraws", { params });
+  return res.data;
+}
+
+// 2. Duyệt yêu cầu rút tiền
+export async function approveWithdrawalApi(withdrawId) {
+  // PUT /wallet/wallets/withdraw/approve/{id}
+  const res = await api.put(`/wallet/wallets/withdraw/approve/${withdrawId}`);
+  return res.data;
+}
+
+// 3. Từ chối yêu cầu rút tiền
+export async function rejectWithdrawalApi(withdrawId) {
+  // PUT /wallet/wallets/withdraw/reject/{id}
+  const res = await api.put(`/wallet/wallets/withdraw/reject/${withdrawId}`);
+  return res.data;
+}
+
+// 🔥 10. API Nạp tiền (Deposit)
+export async function depositApi(amount) {
+  // Endpoint: /wallet/wallets/deposit
+  // Body: { "amount": "10000" }
+  const res = await api.post("/wallet/wallets/deposit", {
+    amount: String(amount) // Đảm bảo gửi dạng string theo yêu cầu
+  });
+  return res.data;
+}

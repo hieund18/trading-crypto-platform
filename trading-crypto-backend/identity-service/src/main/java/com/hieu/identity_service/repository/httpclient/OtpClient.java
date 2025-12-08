@@ -11,7 +11,9 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(name = "otp-service", url = "${app.services.otp}",
+@FeignClient(
+        name = "otp-service",
+        url = "${app.services.otp}",
         configuration = {CustomFeignErrorDecoder.class})
 public interface OtpClient {
     @PostMapping(value = "/send", produces = MediaType.APPLICATION_JSON_VALUE)

@@ -14,6 +14,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     public static final String[] PUBLIC_ENDPOINTS = {
+            "/volume/ranking/**"
     };
 
     private final CustomJwtDecoder customJwtDecoder;

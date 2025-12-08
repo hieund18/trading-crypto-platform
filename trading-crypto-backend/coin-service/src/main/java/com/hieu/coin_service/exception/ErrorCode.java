@@ -24,7 +24,6 @@ public enum ErrorCode {
     INVALID_LIMIT(5008, "Invalid limit", HttpStatus.BAD_REQUEST),
     INVALID_INTERVAL(5009, "Invalid interval", HttpStatus.BAD_REQUEST),
     INVALID_PRICE(5010, "Invalid price", HttpStatus.BAD_REQUEST),
-
     ;
 
     int code;

@@ -1,5 +1,8 @@
 package com.hieu.coin_service.service;
 
+import java.util.List;
+import java.util.Objects;
+
 import com.hieu.coin_service.dto.response.MarketChartResponse;
 import com.hieu.coin_service.entity.Coin;
 import com.hieu.coin_service.entity.MarketChart;
@@ -16,9 +19,6 @@ import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-
-import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -38,37 +38,35 @@ public class MarketChartService {
     @NonFinal
     protected int MAX_LIMIT = 1000;
 
-    public List<MarketChartResponse> getMarketChart(String coinId, String interval, Long startTime, Long endTime, int limit){
-        Coin coin = coinRepository.findById(coinId)
-                .orElseThrow(() -> new AppException(ErrorCode.COIN_NOT_EXISTED));
+    public List<MarketChartResponse> getMarketChart(
+            String coinId, String interval, Long startTime, Long endTime, int limit) {
+        Coin coin = coinRepository.findById(coinId).orElseThrow(() -> new AppException(ErrorCode.COIN_NOT_EXISTED));
 
         String binanceSymbol = coin.getBinanceSymbol();
 
-        if(limit > MAX_LIMIT)
-            throw new AppException(ErrorCode.INVALID_LIMIT);
+        if (limit > MAX_LIMIT) throw new AppException(ErrorCode.INVALID_LIMIT);
 
-        if(!intervals.contains(interval))
-            throw new AppException(ErrorCode.INVALID_INTERVAL);
+        if (!intervals.contains(interval)) throw new AppException(ErrorCode.INVALID_INTERVAL);
 
         long now = System.currentTimeMillis();
-        if(endTime == null)
-            endTime = now;
+        if (endTime == null) endTime = now;
 
-        if(startTime == null)
-            startTime = endTime - (limit * getDurationMillis(interval));
+        if (startTime == null) startTime = endTime - (limit * getDurationMillis(interval));
 
-        List<MarketChart> marketCharts = marketChartRepository
-                .findBySymbolAndIntervalAndOpenTimeBetweenOrderByOpenTimeAsc(binanceSymbol, interval, startTime, endTime);
+        List<MarketChart> marketCharts =
+                marketChartRepository.findBySymbolAndIntervalAndOpenTimeBetweenOrderByOpenTimeAsc(
+                        binanceSymbol, interval, startTime, endTime);
 
-        if(marketCharts.size() > limit)
+        if (marketCharts.size() > limit)
             marketCharts = marketCharts.subList(marketCharts.size() - limit, marketCharts.size());
 
-        return marketCharts.stream().map(marketChartMapper::toMarketChartResponse).toList();
+        return marketCharts.stream()
+                .map(marketChartMapper::toMarketChartResponse)
+                .toList();
     }
 
     public void initMarketChart() {
-        if(marketChartRepository.count() > 0)
-            return;
+        if (marketChartRepository.count() > 0) return;
 
         for (String interval : intervals) {
             syncIntervalBatch(interval);
@@ -77,9 +75,25 @@ public class MarketChartService {
         log.info("Init market chart complete");
     }
 
+    public void initMarketChartBySymbol(String symbol) {
+        if (!coinRepository.existsByBinanceSymbol(symbol)) return;
+
+        for (String interval : intervals) {
+            try {
+                syncKline(symbol, interval);
+            } catch (Exception exception) {
+                log.error("Failed to sync chart for {} interval {}", symbol, interval, exception);
+            }
+        }
+
+        log.info("Sync interval for {} coin complete", symbol);
+    }
+
     public void syncIntervalBatch(String interval) {
         var binanceSymbols = coinRepository.findByIsActiveTrue().stream()
-                .map(Coin::getBinanceSymbol).filter(Objects::nonNull).toList();
+                .map(Coin::getBinanceSymbol)
+                .filter(Objects::nonNull)
+                .toList();
 
         for (String symbol : binanceSymbols) {
             try {
@@ -93,17 +107,14 @@ public class MarketChartService {
     }
 
     public void syncKline(String symbol, String interval) {
-        var lastCandle = marketChartRepository
-                .findFirstBySymbolAndIntervalOrderByOpenTimeDesc(symbol, interval);
+        var lastCandle = marketChartRepository.findFirstBySymbolAndIntervalOrderByOpenTimeDesc(symbol, interval);
 
-        Long startTime = lastCandle
-                .map(marketChart -> marketChart.getOpenTime() + 1)
-                .orElse(null);
+        Long startTime =
+                lastCandle.map(marketChart -> marketChart.getOpenTime() + 1).orElse(null);
 
         var klines = binanceClient.getKlines(symbol, interval, 1000, startTime, null);
 
-        if (CollectionUtils.isEmpty(klines))
-            return;
+        if (CollectionUtils.isEmpty(klines)) return;
 
         List<Object> last = klines.get(klines.size() - 1);
         long closeTime = ((Number) last.get(6)).longValue();
@@ -112,11 +123,11 @@ public class MarketChartService {
             klines.remove(klines.size() - 1);
         }
 
-        if (CollectionUtils.isEmpty(klines))
-            return;
+        if (CollectionUtils.isEmpty(klines)) return;
 
         List<MarketChart> marketCharts = klines.stream()
-                .map(objects -> toMarketChart(symbol, interval, objects)).toList();
+                .map(objects -> toMarketChart(symbol, interval, objects))
+                .toList();
 
         marketChartRepository.saveAll(marketCharts);
     }
@@ -138,10 +149,10 @@ public class MarketChartService {
                 .build();
     }
 
-    private long getDurationMillis(String interval){
+    private long getDurationMillis(String interval) {
         if (interval == null) return 0;
 
-        return switch (interval){
+        return switch (interval) {
             case "5m" -> 5 * 60 * 1000L;
             case "15m" -> 15 * 60 * 1000L;
             case "1h" -> 60 * 60 * 1000L;

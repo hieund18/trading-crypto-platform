@@ -10,18 +10,19 @@ public class RedisKeyUtil {
     }
 
     public static String pageCoins(Pageable pageable) {
-        return PREFIX + "coin:page:" + pageable.getPageNumber() + ":size:" + pageable.getPageSize() + ":sort:" + pageable.getSort();
+        return PREFIX + "coin:page:" + pageable.getPageNumber() + ":size:" + pageable.getPageSize() + ":sort:"
+                + pageable.getSort();
     }
 
-    public static String trendingCoins(){
+    public static String trendingCoins() {
         return PREFIX + "coin:trending";
     }
 
-    public static String binanceTicker(String symbol){
+    public static String binanceTicker(String symbol) {
         return PREFIX + "ticker:" + symbol.toUpperCase();
     }
 
-    public static String leaderboard(String type){
+    public static String leaderboard(String type) {
         return PREFIX + "leaderboard:" + type;
     }
 }

@@ -5,6 +5,5 @@ public class PredefinedPermission {
     public static final String APPROVE_POST = "APPROVE_POST";
     public static final String REJECT_POST = "REJECT_POST";
 
-    private PredefinedPermission(){
-    }
+    private PredefinedPermission() {}
 }

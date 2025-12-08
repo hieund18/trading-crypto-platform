@@ -8,6 +8,8 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useThemeContext } from "../../context/ThemeContext";
 import Logo from "../common/Logo";
+import { logoutApi } from "../../api/authApi";
+import { getRefreshToken } from "../../api/tokenUtils";
 
 // Icons
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
@@ -16,8 +18,8 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import PeopleIcon from '@mui/icons-material/People';
 import CurrencyBitcoinIcon from '@mui/icons-material/CurrencyBitcoin';
-import PaymentIcon from '@mui/icons-material/Payment';
-import SecurityIcon from '@mui/icons-material/Security';
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
+// import SecurityIcon from '@mui/icons-material/Security'; // <-- Có thể bỏ import này
 import SettingsIcon from '@mui/icons-material/Settings';
 
 export default function AdminHeader() {
@@ -30,14 +32,35 @@ export default function AdminHeader() {
   const handleOpenMenu = (event) => setAnchorEl(event.currentTarget);
   const handleClose = () => setAnchorEl(null);
 
-  const handleLogout = () => {
-    handleClose();
-    logout();
+  const handleLogout = async () => {
+    const token = getRefreshToken();
+    try {
+      if (token) await logoutApi(token);
+    } catch (error) {
+      console.error("Logout error", error);
+    } finally {
+      handleClose();
+      logout();
+    }
   };
 
   const displayName = user?.profile?.fullName || user?.username;
   const displayEmail = user?.email;
   const displayAvatar = user?.profile?.avatar;
+
+  const menuItemSx = {
+    mx: 1, 
+    mb: 0.5, 
+    borderRadius: 1, 
+    color: "text.secondary",
+    "& .MuiListItemIcon-root": { color: "inherit", minWidth: 36 },
+    "&:hover": { 
+        bgcolor: "action.hover", 
+        color: "text.primary" 
+    },
+    transition: "all 0.2s",
+    py: 1.2
+  };
 
   return (
     <AppBar 
@@ -72,7 +95,6 @@ export default function AdminHeader() {
             </Avatar>
           </IconButton>
 
-          {/* MENU DROPDOWN */}
           <Menu
             anchorEl={anchorEl}
             open={open}
@@ -84,14 +106,11 @@ export default function AdminHeader() {
                 mt: 1.5,
                 border: "1px solid",
                 borderColor: "divider",
-                bgcolor: "background.popup" // 🔥 SỬ DỤNG MÀU MỚI TẠI ĐÂY
               },
             }}
-            transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-            anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
           >
             <Box sx={{ p: 2, display: "flex", alignItems: "center", gap: 1.5 }}>
-              <Avatar src={displayAvatar} sx={{ bgcolor: "primary.main", fontWeight: 700 }}>
+              <Avatar src={displayAvatar} sx={{ bgcolor: "primary.main" }}>
                 {displayName?.charAt(0).toUpperCase()}
               </Avatar>
               <Box>
@@ -104,40 +123,39 @@ export default function AdminHeader() {
               </Box>
             </Box>
 
-            <Divider />
+            <Divider sx={{ mb: 1 }} />
 
-            <MenuItem component={Link} to="/admin" onClick={handleClose}>
+            <MenuItem component={Link} to="/admin" onClick={handleClose} sx={menuItemSx}>
               <ListItemIcon><DashboardIcon fontSize="small" /></ListItemIcon>
               Tổng quan
             </MenuItem>
-            <MenuItem component={Link} to="/admin/users" onClick={handleClose}>
+            
+            <MenuItem component={Link} to="/admin/users" onClick={handleClose} sx={menuItemSx}>
               <ListItemIcon><PeopleIcon fontSize="small" /></ListItemIcon>
               Người dùng
             </MenuItem>
-            <MenuItem component={Link} to="/admin/coins" onClick={handleClose}>
+            
+            <MenuItem component={Link} to="/admin/coins" onClick={handleClose} sx={menuItemSx}>
               <ListItemIcon><CurrencyBitcoinIcon fontSize="small" /></ListItemIcon>
               Quản lý Coin
             </MenuItem>
-            <MenuItem component={Link} to="/admin/withdrawals" onClick={handleClose}>
-              <ListItemIcon><PaymentIcon fontSize="small" /></ListItemIcon>
-              Duyệt rút tiền
+            
+            <MenuItem component={Link} to="/admin/transactions" onClick={handleClose} sx={menuItemSx}>
+              <ListItemIcon><ReceiptLongIcon fontSize="small" /></ListItemIcon>
+              Quản lý giao dịch
             </MenuItem>
             
-            <Divider />
-
-            <MenuItem component={Link} to="/admin/roles" onClick={handleClose}>
-              <ListItemIcon><SecurityIcon fontSize="small" /></ListItemIcon>
-              Phân quyền
-            </MenuItem>
-            <MenuItem component={Link} to="/admin/settings" onClick={handleClose}>
+            {/* 🔥 ĐÃ XÓA MỤC PHÂN QUYỀN TẠI ĐÂY */}
+            
+            <MenuItem component={Link} to="/admin/settings" onClick={handleClose} sx={menuItemSx}>
               <ListItemIcon><SettingsIcon fontSize="small" /></ListItemIcon>
               Cài đặt
             </MenuItem>
 
-            <Divider />
+            <Divider sx={{ my: 1 }} />
 
-            <MenuItem onClick={handleLogout} sx={{ color: "error.main" }}>
-              <ListItemIcon><LogoutIcon fontSize="small" color="error" /></ListItemIcon>
+            <MenuItem onClick={handleLogout} sx={menuItemSx}>
+              <ListItemIcon><LogoutIcon fontSize="small" /></ListItemIcon>
               Đăng xuất
             </MenuItem>
           </Menu>

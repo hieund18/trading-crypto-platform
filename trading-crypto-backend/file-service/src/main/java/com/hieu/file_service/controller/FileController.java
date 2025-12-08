@@ -1,5 +1,7 @@
 package com.hieu.file_service.controller;
 
+import java.io.IOException;
+
 import com.hieu.file_service.constant.AccessScope;
 import com.hieu.file_service.constant.FileType;
 import com.hieu.file_service.dto.ApiResponse;
@@ -14,20 +16,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class FileController {
     FileService fileService;
 
-//    @PostMapping("/media/upload")
-//    ApiResponse<FileResponse> uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
-//        return ApiResponse.<FileResponse>builder()
-//                .result(fileService.uploadFile(file))
-//                .build();
-//    }
+    //    @PostMapping("/media/upload")
+    //    ApiResponse<FileResponse> uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
+    //        return ApiResponse.<FileResponse>builder()
+    //                .result(fileService.uploadFile(file))
+    //                .build();
+    //    }
 
     @GetMapping("/media/download/{fileName}")
     ResponseEntity<Resource> downloadFile(@PathVariable String fileName) throws IOException {
@@ -42,18 +42,19 @@ public class FileController {
     ApiResponse<FileResponse> uploadMediaAWS(
             @RequestParam("file") MultipartFile file,
             @RequestParam("type") FileType type,
-            @RequestParam(value = "accessLevel", defaultValue = "PUBLIC") AccessScope accessScope) throws IOException {
+            @RequestParam(value = "accessLevel", defaultValue = "PUBLIC") AccessScope accessScope)
+            throws IOException {
         return ApiResponse.<FileResponse>builder()
                 .result(fileService.uploadFileAWS(file, type, accessScope))
                 .build();
     }
 
-//    @PostMapping("/media/upload/private")
-//    ApiResponse<FileResponse> uploadMediaPrivate(@RequestParam("file") MultipartFile file) throws IOException {
-//        return ApiResponse.<FileResponse>builder()
-//                .result(fileService.uploadFileAWS(file, false))
-//                .build();
-//    }
+    //    @PostMapping("/media/upload/private")
+    //    ApiResponse<FileResponse> uploadMediaPrivate(@RequestParam("file") MultipartFile file) throws IOException {
+    //        return ApiResponse.<FileResponse>builder()
+    //                .result(fileService.uploadFileAWS(file, false))
+    //                .build();
+    //    }
 
     @GetMapping("/media/url")
     ApiResponse<FileResponse> getUrlAWS(@RequestParam("path") String path) {
@@ -63,8 +64,8 @@ public class FileController {
     }
 
     @PutMapping("/media/{fileName}/access-level")
-    ApiResponse<Void> updateAccessLevelAWS(@PathVariable String fileName,
-                                           @RequestParam("accessLevel") String accessLevel) {
+    ApiResponse<Void> updateAccessLevelAWS(
+            @PathVariable String fileName, @RequestParam("accessLevel") String accessLevel) {
         fileService.updateAccessLevelAWS(fileName, accessLevel);
 
         return ApiResponse.<Void>builder().build();

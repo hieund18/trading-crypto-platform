@@ -15,6 +15,7 @@ import org.springframework.data.mongodb.core.mapping.MongoId;
 public class CoinGeckoMaster {
     @MongoId
     String id;
+
     String symbol;
     String name;
 }

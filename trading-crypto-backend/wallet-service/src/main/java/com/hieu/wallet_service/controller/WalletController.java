@@ -41,6 +41,17 @@ public class WalletController {
                 .build();
     }
 
+    @GetMapping("/transactions")
+    ApiResponse<PageResponse<WalletTransactionResponse>> getTransactions(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String type,
+            @PageableDefault(page = 1, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        return ApiResponse.<PageResponse<WalletTransactionResponse>>builder()
+                .result(walletService.getTransactions(keyword ,type, pageable))
+                .build();
+    }
+
     @PostMapping("/deposit")
     ApiResponse<WalletResponse> deposit(@RequestBody @Valid DepositRequest request) {
         return ApiResponse.<WalletResponse>builder()
@@ -78,12 +89,14 @@ public class WalletController {
                 .build();
     }
 
-    @GetMapping("/withdraw")
+    @GetMapping("/withdraws")
     ApiResponse<PageResponse<WithdrawalResponse>> getWithdrawals(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String status,
             @PageableDefault(page = 1, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         return ApiResponse.<PageResponse<WithdrawalResponse>>builder()
-                .result(walletService.getWithdrawals(pageable))
+                .result(walletService.getWithdrawals(keyword, status, pageable))
                 .build();
     }
 

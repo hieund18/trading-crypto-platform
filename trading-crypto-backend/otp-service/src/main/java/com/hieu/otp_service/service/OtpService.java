@@ -1,5 +1,10 @@
 package com.hieu.otp_service.service;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.hieu.common.dto.NotificationEvent;
 import com.hieu.otp_service.constant.OtpType;
 import com.hieu.otp_service.constant.PredefinedChannel;
@@ -22,12 +27,6 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -53,8 +52,7 @@ public class OtpService {
             throw new AppException(ErrorCode.INVALID_KEY);
         }
 
-        if (!checkRateLimit(recipient, otpType))
-            throw new AppException(ErrorCode.RATE_LIMIT_EXCEEDED);
+        if (!checkRateLimit(recipient, otpType)) throw new AppException(ErrorCode.RATE_LIMIT_EXCEEDED);
 
         otpRepository.deleteByRecipientAndOtpType(recipient, otpType);
 
@@ -88,16 +86,16 @@ public class OtpService {
     }
 
     public VerifyOtpResponse verifyOtp(VerifyOtpRequest request) {
-        Otp otp = otpRepository.findByRecipientAndOtpType(request.getRecipient(), request.getOtpType()).orElse(null);
+        Otp otp = otpRepository
+                .findByRecipientAndOtpType(request.getRecipient(), request.getOtpType())
+                .orElse(null);
 
-        if (otp == null)
-            throw new AppException(ErrorCode.INVALID_OTP);
+        if (otp == null) throw new AppException(ErrorCode.INVALID_OTP);
 
-        if (otp.getExpiryTime().isBefore(Instant.now()))
-            throw new AppException(ErrorCode.OTP_EXPIRED);
+        if (otp.getExpiryTime().isBefore(Instant.now())) throw new AppException(ErrorCode.OTP_EXPIRED);
 
         if (otp.getAttemptCount() >= 5) {
-//            otpRepository.deleteByRecipientAndOtpType(request.getRecipient(), request.getOtpType());
+            //            otpRepository.deleteByRecipientAndOtpType(request.getRecipient(), request.getOtpType());
             throw new AppException(ErrorCode.OTP_ATTEMPT_LIMIT_EXCEEDED);
         }
 
@@ -109,19 +107,18 @@ public class OtpService {
 
         otpRepository.deleteByRecipientAndOtpType(request.getRecipient(), request.getOtpType());
 
-        return VerifyOtpResponse.builder()
-                .valid(true)
-                .build();
+        return VerifyOtpResponse.builder().valid(true).build();
     }
 
     private boolean checkRateLimit(String recipient, String otpType) {
-        RateLimit rateLimit = rateLimitRepository.findByRecipientAndOtpType(recipient, otpType).orElse(null);
+        RateLimit rateLimit = rateLimitRepository
+                .findByRecipientAndOtpType(recipient, otpType)
+                .orElse(null);
 
         OtpType type = OtpType.valueOf(otpType);
 
         if (rateLimit != null) {
-            if (rateLimit.getCount() >= type.getMaxSendPerWindow())
-                return false;
+            if (rateLimit.getCount() >= type.getMaxSendPerWindow()) return false;
 
             rateLimit.setCount(rateLimit.getCount() + 1);
             rateLimitRepository.save(rateLimit);
@@ -138,5 +135,4 @@ public class OtpService {
         rateLimitRepository.save(rateLimit);
         return true;
     }
-
 }

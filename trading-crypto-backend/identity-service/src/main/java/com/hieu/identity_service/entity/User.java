@@ -1,11 +1,10 @@
 package com.hieu.identity_service.entity;
 
+import java.util.Set;
+
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.time.Instant;
-import java.util.Set;
 
 @Getter
 @Setter

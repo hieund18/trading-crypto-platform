@@ -1,5 +1,7 @@
 package com.hieu.identity_service.configuration;
 
+import java.util.List;
+
 import com.hieu.identity_service.constant.PredefinedPermission;
 import com.hieu.identity_service.entity.Permission;
 import com.hieu.identity_service.repository.PermissionRepository;
@@ -11,8 +13,6 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @Component
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -23,19 +23,14 @@ public class PermissionSeeder implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-//        log.info("Seeding default permission");
+        //        log.info("Seeding default permission");
 
         var permissions = List.of(
-                PredefinedPermission.APPROVE_POST,
-                PredefinedPermission.CREATE_POST,
-                PredefinedPermission.REJECT_POST
-        );
+                PredefinedPermission.APPROVE_POST, PredefinedPermission.CREATE_POST, PredefinedPermission.REJECT_POST);
 
         permissions.forEach(s -> {
-            if (!permissionRepository.existsByName(s)){
-                permissionRepository.save(Permission.builder()
-                        .name(s)
-                        .build());
+            if (!permissionRepository.existsByName(s)) {
+                permissionRepository.save(Permission.builder().name(s).build());
             }
         });
     }

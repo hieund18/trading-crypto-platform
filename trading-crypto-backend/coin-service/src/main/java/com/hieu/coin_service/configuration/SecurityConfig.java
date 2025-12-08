@@ -2,7 +2,6 @@ package com.hieu.coin_service.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -17,7 +16,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private static final String[] PUBLIC_ENDPOINTS = {
-            "/markets/trending", "/markets", "/markets/**", "/ws/**", "/markets/charts"
+        "/markets/trending", "/markets", "/markets/**", "/ws/**", "/markets/charts"
     };
 
     private final CustomJwtDecoder customJwtDecoder;

@@ -9,6 +9,5 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(name = "outbound-user", url = "${outbound.identity.google.api-url}")
 public interface OutboundUserClient {
     @GetMapping(value = "/oauth2/v1/userinfo", produces = MediaType.APPLICATION_JSON_VALUE)
-    OutboundUserResponse getUserInfo(@RequestParam("alt") String alt,
-                                     @RequestParam("access_token") String accessToken);
+    OutboundUserResponse getUserInfo(@RequestParam("alt") String alt, @RequestParam("access_token") String accessToken);
 }

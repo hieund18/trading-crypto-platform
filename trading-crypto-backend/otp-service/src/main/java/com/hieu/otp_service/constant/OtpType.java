@@ -15,7 +15,6 @@ public enum OtpType {
     TRANSACTION(3, 1, 3, 1, "transaction"),
     WITHDRAW(3, 1, 3, 1, "transaction"),
     TRANSFER(3, 1, 3, 1, "transaction"),
-
     ;
 
     OtpType(int maxSendPerWindow, int timeLimitWindow, int maxVerifyAttempts, int otpTtl, String templateCode) {
@@ -32,11 +31,11 @@ public enum OtpType {
     int otpTtl;
     String templateCode;
 
-    public static OtpType toOtpType(String otpType){
+    public static OtpType toOtpType(String otpType) {
         OtpType type;
-        try{
+        try {
             type = OtpType.valueOf(otpType);
-        }catch (IllegalArgumentException exception){
+        } catch (IllegalArgumentException exception) {
             throw new AppException(ErrorCode.INVALID_KEY);
         }
         return type;

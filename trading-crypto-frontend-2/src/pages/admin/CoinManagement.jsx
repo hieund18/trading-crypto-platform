@@ -8,7 +8,7 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import PowerSettingsNewIcon from '@mui/icons-material/PowerSettingsNew';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'; 
-import RestartAltIcon from '@mui/icons-material/RestartAlt'; // 🔥 Icon Đặt lại
+import RestartAltIcon from '@mui/icons-material/RestartAlt'; 
 import CheckIcon from '@mui/icons-material/Check'; 
 
 import AdminLayout from "../../components/admin/AdminLayout";
@@ -17,6 +17,11 @@ import { getMarketsApi, updateCoinStatusApi } from "../../api/coinApi";
 import { useCoinTicker } from "../../hooks/useCoinTicker"; 
 import { formatPrice, formatCompactCurrency } from "../../utils/formatters";
 import { useToast } from "../../utils/toast";
+
+// 🔥 IMPORT MỚI
+import ConfirmCoinStatusDialog from "../../components/admin/ConfirmCoinStatusDialog";
+import CoinDetailModal from "../../components/admin/CoinDetailModal";
+import AddCoinModal from "../../components/admin/AddCoinModal";
 
 const TEXT_HEAD_COLOR = "#848e9c"; 
 const COMMON_WEIGHT = 500;         
@@ -27,9 +32,14 @@ export default function CoinManagement() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
-  
+  const [openAdd, setOpenAdd] = useState(false);
+
   const [keyword, setKeyword] = useState(""); 
   const [filterStatus, setFilterStatus] = useState("ALL");
+
+  // 🔥 STATE MODAL & DIALOG
+  const [selectedCoin, setSelectedCoin] = useState(null); // Chi tiết
+  const [confirmDialog, setConfirmDialog] = useState({ open: false, coin: null, loading: false }); // Xác nhận khóa
 
   const { toastSuccess, toastError, toastInfo } = useToast();
 
@@ -38,7 +48,7 @@ export default function CoinManagement() {
     try {
       const params = { 
         page: page, 
-        size: 10,
+        size: 20, 
         sort: "marketCap,desc" 
       };
       if (keyword) params.keyword = keyword;
@@ -64,36 +74,51 @@ export default function CoinManagement() {
 
   const liveCoins = useCoinTicker(initialCoins);
 
-  // 🔥 Hàm Đặt lại (Reset)
   const handleResetFilters = () => {
       setKeyword("");
       setFilterStatus("ALL");
       setPage(1);
   };
 
-  const handleToggleStatus = async (coin) => {
-    const newStatus = !coin.isActive;
-    const actionName = newStatus ? "Kích hoạt" : "Vô hiệu hóa";
-    if (!window.confirm(`Bạn có chắc muốn ${actionName} đồng ${coin.symbol.toUpperCase()}?`)) return;
+  // 🔥 1. Mở Dialog thay vì alert
+  const handleClickToggle = (e, coin) => {
+    e.stopPropagation(); // Ngăn mở modal chi tiết
+    setConfirmDialog({ open: true, coin: coin, loading: false });
+  };
+
+  // 🔥 2. Xử lý API trong Dialog
+  const handleConfirmStatus = async () => {
+    const { coin } = confirmDialog;
+    if (!coin) return;
+
+    setConfirmDialog(prev => ({ ...prev, loading: true }));
 
     try {
-      const res = await updateCoinStatusApi(coin.id, newStatus);
+      const res = await updateCoinStatusApi(coin.id);
+      
       if (res.code === 1000) {
+        const actionName = !coin.isActive ? "Kích hoạt" : "Vô hiệu hóa";
         toastSuccess(`Đã ${actionName} thành công!`);
-        setInitialCoins(prev => prev.map(c => c.id === coin.id ? { ...c, isActive: newStatus } : c));
-      } else {
-        toastError(res.message || "Thao tác thất bại");
-      }
+        // Cập nhật state
+        setInitialCoins(prev => prev.map(c => c.id === coin.id ? { ...c, isActive: !c.isActive } : c));
+        setConfirmDialog({ open: false, coin: null, loading: false });
+      } 
+      else if (res.code === 1003) toastError("Bạn không có quyền thực hiện thao tác này!");
+      else if (res.code === 5103) { toastError("Coin không tồn tại!"); fetchCoins(); }
+      else toastError(res.message || "Thao tác thất bại");
     } catch (err) {
-      toastError("Lỗi kết nối máy chủ");
+      const backendErr = err.response?.data;
+      if (backendErr?.code === 1003) toastError("Bạn không có quyền thực hiện!");
+      else toastError("Lỗi kết nối máy chủ");
+    } finally {
+      setConfirmDialog(prev => ({ ...prev, loading: false }));
     }
   };
 
   const handleCreateCoin = () => {
-    toastInfo("Tính năng Thêm Coin đang phát triển!");
+    setOpenAdd(true);
   };
 
-  // --- STYLES (Đồng bộ với UserManagement) ---
   const actionButtonStyle = { 
     color: "text.primary", bgcolor: "action.hover", boxShadow: "none", 
     textTransform: "none", fontWeight: 600, borderRadius: 1, px: 2, py: 0.8, 
@@ -102,85 +127,37 @@ export default function CoinManagement() {
   };
   
   const inputStyle = { bgcolor: "background.default", borderRadius: 1, "& .MuiOutlinedInput-root": { fontSize: "0.875rem", "& fieldset": { borderColor: "divider" }, "&:hover fieldset": { borderColor: "primary.main" }, "&.Mui-focused fieldset": { borderColor: "primary.main" } }, "& .MuiOutlinedInput-notchedOutline": { borderColor: "divider" }, "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "primary.main" }, "& input::placeholder": { fontSize: "0.85rem" } };
-  
   const menuItemSx = { display: "flex", justifyContent: "space-between", alignItems: "center", color: "text.secondary", py: 1.2, fontSize: "0.875rem", "&.Mui-selected": { bgcolor: "action.selected", color: "text.primary", fontWeight: 700 }, "& .MuiTypography-root": { fontSize: "0.875rem" } };
-
-  const getStatusLabel = (val) => {
-      if (val === "TRUE") return "Đang hoạt động";
-      if (val === "FALSE") return "Đã ẩn";
-      return "Tất cả";
-  };
-
+  const getStatusLabel = (val) => { if (val === "TRUE") return "Đang hoạt động"; if (val === "FALSE") return "Đã ẩn"; return "Tất cả"; };
   const headerSx = { color: TEXT_HEAD_COLOR, fontWeight: 600, fontSize: 13 };
 
   return (
     <AdminLayout>
-      {/* 1. HEADER: Title + Nút Thêm Mới */}
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Typography variant="h5" fontWeight={700}>Quản lý Coin</Typography>
         <Button 
             variant="contained" 
             startIcon={<AddCircleOutlineIcon />}
-            onClick={handleCreateCoin}
+            onClick={handleCreateCoin} // 🔥 Gắn hàm mở modal
             sx={actionButtonStyle}
         >
             Thêm mới
         </Button>
       </Box>
 
-      {/* 2. FILTER BAR */}
-      <Box 
-        sx={{ 
-            display: "flex", gap: 2, mb: 3, flexWrap: "wrap", alignItems: "center",
-            // Đã xóa khung viền card để giống UserManagement
-        }}
-      >
-          {/* Lọc Trạng thái */}
-          <FormControl size="small" sx={{ minWidth: 220 }}>
-            <Select
-              value={filterStatus}
-              onChange={(e) => { setFilterStatus(e.target.value); setPage(1); }}
-              displayEmpty sx={inputStyle}
-              renderValue={(selected) => (
-                <Box sx={{ display: 'flex', justifyContent: "space-between", width: "100%", alignItems: "center" }}>
-                  <Typography color="text.primary" fontSize="0.875rem" fontWeight={600}>Trạng thái</Typography>
-                  <Typography fontWeight={600} color="text.primary" fontSize="0.875rem">{getStatusLabel(selected)}</Typography>
-                </Box>
-              )}
-            >
+      <Box sx={{ display: "flex", gap: 2, mb: 3, flexWrap: "wrap", alignItems: "center" }}>
+          <FormControl size="small" sx={{ minWidth: 260 }}>
+            <Select value={filterStatus} onChange={(e) => { setFilterStatus(e.target.value); setPage(1); }} displayEmpty sx={inputStyle} renderValue={(selected) => (<Box sx={{ display: 'flex', justifyContent: "space-between", width: "100%", alignItems: "center" }}><Typography color="text.primary" fontSize="0.875rem" fontWeight={600}>Trạng thái</Typography><Typography fontWeight={600} color="text.primary" fontSize="0.875rem">{getStatusLabel(selected)}</Typography></Box>)}>
               <MenuItem value="ALL" sx={menuItemSx}><ListItemText primary="Tất cả" />{filterStatus === "ALL" && <CheckIcon fontSize="small" />}</MenuItem>
               <MenuItem value="TRUE" sx={menuItemSx}><ListItemText primary="Đang hoạt động" />{filterStatus === "TRUE" && <CheckIcon fontSize="small" />}</MenuItem>
               <MenuItem value="FALSE" sx={menuItemSx}><ListItemText primary="Đã ẩn (Inactive)" />{filterStatus === "FALSE" && <CheckIcon fontSize="small" />}</MenuItem>
             </Select>
           </FormControl>
-
-          {/* Nút Đặt lại */}
-          <Button 
-            variant="contained" 
-            startIcon={<RestartAltIcon />} 
-            onClick={handleResetFilters} 
-            sx={{ ...actionButtonStyle, height: 40 }} 
-          >
-            Đặt lại
-          </Button>
-
-          {/* Khoảng trống */}
+          <Button variant="contained" startIcon={<RestartAltIcon />} onClick={handleResetFilters} sx={{ ...actionButtonStyle, height: 40 }}>Đặt lại</Button>
           <Box flexGrow={1} />
-
-          {/* Tìm kiếm */}
-          <TextField 
-              size="small" 
-              placeholder="Tìm kiếm Coin..." 
-              value={keyword} 
-              onChange={(e) => { setKeyword(e.target.value); setPage(1); }}
-              InputProps={{
-                startAdornment: <InputAdornment position="start"><SearchIcon sx={{ color: "text.secondary", fontSize: 20 }} /></InputAdornment>,
-              }}
-              sx={{ width: 280, ...inputStyle }}
-          />
+          <TextField size="small" placeholder="Tìm kiếm Coin..." value={keyword} onChange={(e) => { setKeyword(e.target.value); setPage(1); }} InputProps={{ startAdornment: <InputAdornment position="start"><SearchIcon sx={{ color: "text.secondary", fontSize: 20 }} /></InputAdornment>, }} sx={{ width: 280, ...inputStyle }} />
       </Box>
 
-      {/* 3. BẢNG DỮ LIỆU */}
       <TableContainer component={Paper} elevation={0} sx={{ bgcolor: "background.default", border: "none", borderRadius: 0, "& .MuiTableCell-root": { borderBottom: "1px solid", borderColor: "divider" } }}>
         <Table>
           <TableHead>
@@ -201,26 +178,26 @@ export default function CoinManagement() {
                <TableRow><TableCell colSpan={7} align="center" sx={{ py: 3, borderBottom: "none" }}>Không tìm thấy coin nào</TableCell></TableRow>
             ) : (
               liveCoins.map((coin) => (
-                <TableRow key={coin.id} hover sx={{ "&:last-child td": { borderBottom: 0 }, "&:hover": { bgcolor: "action.hover" } }}>
-                  
-                  {/* 1. Tên (Icon + Symbol + Name + BinanceSymbol) */}
+                <TableRow 
+                    key={coin.id} 
+                    hover 
+                    // 🔥 3. CLICK ĐỂ XEM CHI TIẾT
+                    onClick={() => setSelectedCoin(coin)}
+                    sx={{ "&:last-child td": { borderBottom: 0 }, "&:hover": { bgcolor: "action.hover" }, cursor: "pointer" }}
+                >
                   <TableCell sx={{ pl: 0 }}>
                      <Stack direction="row" alignItems="center" spacing={1.5}>
                         <Avatar src={coin.image} alt={coin.name} sx={{ width: 32, height: 32 }} />
                         <Box>
                             <Stack direction="row" alignItems="baseline" spacing={0.8}>
-                                <Typography fontSize={ROW_FONT_SIZE} fontWeight={COMMON_WEIGHT} color="text.primary">
-                                    {coin.symbol?.toUpperCase()}
-                                </Typography>
-                                <Typography variant="caption" color="text.secondary">
-                                    {coin.name}
-                                </Typography>
+                                <Typography fontSize={ROW_FONT_SIZE} fontWeight={COMMON_WEIGHT} color="text.primary">{coin.symbol?.toUpperCase()}</Typography>
+                                <Typography variant="caption" color="text.secondary">{coin.name}</Typography>
                             </Stack>
                             
-                            {/* 🔥 HIỂN THỊ BINANCE SYMBOL */}
+                            {/* 🔥 4. SỬA MÀU BINANCE SYMBOL */}
                             {coin.binanceSymbol && (
-                                <Tooltip title="Mã cặp trên Binance (Dùng để lấy giá)">
-                                    <Typography variant="caption" sx={{ fontFamily: 'monospace', fontSize: '0.7rem', color: 'primary.main', display: 'block' }}>
+                                <Tooltip title="Mã cặp trên Binance">
+                                    <Typography variant="caption" sx={{ fontFamily: 'monospace', fontSize: '0.7rem', color: 'text.secondary', display: 'block' }}>
                                         {coin.binanceSymbol.toUpperCase()}
                                     </Typography>
                                 </Tooltip>
@@ -229,51 +206,17 @@ export default function CoinManagement() {
                      </Stack>
                   </TableCell>
                   
-                  {/* 2. Giá */}
-                  <TableCell align="right">
-                    <Typography fontSize={ROW_FONT_SIZE} fontWeight={COMMON_WEIGHT} color="text.primary">
-                        {formatPrice(coin.currentPrice)}
-                    </Typography>
-                  </TableCell>
+                  <TableCell align="right"><Typography fontSize={ROW_FONT_SIZE} fontWeight={COMMON_WEIGHT} color="text.primary">{formatPrice(coin.currentPrice)}</Typography></TableCell>
+                  <TableCell align="right"><PercentChange value={coin.priceChangePercentage24h} sx={{ justifyContent: "flex-end", fontWeight: COMMON_WEIGHT, fontSize: ROW_FONT_SIZE }} /></TableCell>
+                  <TableCell align="right"><Typography fontSize={ROW_FONT_SIZE} fontWeight={COMMON_WEIGHT} color="text.primary">{formatCompactCurrency(coin.totalVolume)}</Typography></TableCell>
+                  <TableCell align="right"><Typography fontSize={ROW_FONT_SIZE} fontWeight={COMMON_WEIGHT} color="text.primary">{formatCompactCurrency(coin.marketCap)}</Typography></TableCell>
+                  <TableCell align="center"><Chip label={coin.isActive ? "Active" : "Hidden"} color={coin.isActive ? "success" : "default"} size="small" variant={coin.isActive ? "filled" : "outlined"} sx={{ fontWeight: 600, minWidth: 60, height: 24, fontSize: "0.75rem" }} /></TableCell>
                   
-                  {/* 3. Thay đổi */}
-                  <TableCell align="right">
-                     <PercentChange 
-                        value={coin.priceChangePercentage24h} 
-                        sx={{ justifyContent: "flex-end", fontWeight: COMMON_WEIGHT, fontSize: ROW_FONT_SIZE }} 
-                     />
-                  </TableCell>
-
-                  {/* 4. Volume */}
-                  <TableCell align="right">
-                    <Typography fontSize={ROW_FONT_SIZE} fontWeight={COMMON_WEIGHT} color="text.primary">
-                        {formatCompactCurrency(coin.totalVolume)}
-                    </Typography>
-                  </TableCell>
-
-                  {/* 5. Vốn hóa */}
-                  <TableCell align="right">
-                    <Typography fontSize={ROW_FONT_SIZE} fontWeight={COMMON_WEIGHT} color="text.primary">
-                        {formatCompactCurrency(coin.marketCap)}
-                    </Typography>
-                  </TableCell>
-
-                  {/* 6. Trạng thái */}
-                  <TableCell align="center">
-                    <Chip 
-                      label={coin.isActive ? "Active" : "Hidden"} 
-                      color={coin.isActive ? "success" : "default"} 
-                      size="small" 
-                      variant={coin.isActive ? "filled" : "outlined"} 
-                      sx={{ fontWeight: 600, minWidth: 60, height: 24, fontSize: "0.75rem" }}
-                    />
-                  </TableCell>
-
-                  {/* 7. Hành động */}
                   <TableCell align="right" sx={{ pr: 0 }}>
-                    <Tooltip title={coin.isActive ? "Vô hiệu hóa (Ẩn khỏi Market)" : "Kích hoạt (Hiện lên Market)"}>
+                    <Tooltip title={coin.isActive ? "Vô hiệu hóa" : "Kích hoạt"}>
                         <IconButton 
-                            onClick={() => handleToggleStatus(coin)}
+                            // 🔥 5. GỌI HÀM TOGGLE CÓ CONFIRM
+                            onClick={(e) => handleClickToggle(e, coin)}
                             color={coin.isActive ? "success" : "default"}
                             size="small"
                         >
@@ -288,18 +231,29 @@ export default function CoinManagement() {
         </Table>
       </TableContainer>
 
-      {/* Phân trang */}
-      {totalPages > 1 && (
-        <Box mt={3} display="flex" justifyContent="center">
-          <Pagination 
-            count={totalPages} 
-            page={page} 
-            onChange={(e, v) => setPage(v)} 
-            color="primary" 
-            shape="rounded" 
-          />
-        </Box>
-      )}
+      {totalPages > 1 && (<Box mt={3} display="flex" justifyContent="center"><Pagination count={totalPages} page={page} onChange={(e, v) => setPage(v)} color="primary" shape="rounded" /></Box>)}
+
+      <CoinDetailModal 
+        open={!!selectedCoin} 
+        onClose={() => setSelectedCoin(null)} 
+        coin={selectedCoin} 
+        onSuccess={fetchCoins} // 🔥 THÊM DÒNG NÀY
+      />
+      
+      <ConfirmCoinStatusDialog 
+        open={confirmDialog.open} 
+        onClose={() => setConfirmDialog({ ...confirmDialog, open: false })} 
+        onConfirm={handleConfirmStatus} 
+        coin={confirmDialog.coin} 
+        loading={confirmDialog.loading} 
+      />
+
+      <AddCoinModal 
+        open={openAdd}
+        onClose={() => setOpenAdd(false)}
+        onSuccess={fetchCoins} // Refresh lại danh sách sau khi thêm
+      />
+
     </AdminLayout>
   );
 }

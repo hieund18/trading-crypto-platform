@@ -23,13 +23,13 @@ public class FileService {
 
     @CircuitBreaker(name = "fileService")
     @Retry(name = "fileService")
-    public ApiResponse<FileResponse> uploadMediaAWS(MultipartFile file, FileType fileType, AccessScope accessScope){
+    public ApiResponse<FileResponse> uploadMediaAWS(MultipartFile file, FileType fileType, AccessScope accessScope) {
         log.info("Calling upload file");
         return fileClient.uploadMediaAWS(file, fileType, accessScope);
     }
 
     @Retry(name = "fileService")
-    public ApiResponse<Void> deleteFileAWS(String path){
+    public ApiResponse<Void> deleteFileAWS(String path) {
         log.info("Calling delete file");
         return fileClient.deleteFileAWS(path);
     }

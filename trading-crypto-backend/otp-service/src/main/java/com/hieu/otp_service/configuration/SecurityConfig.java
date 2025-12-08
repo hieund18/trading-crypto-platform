@@ -15,9 +15,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private static final String[] PUBLIC_ENDPOINTS = {
-            "/send", "/verify"
-    };
+    private static final String[] PUBLIC_ENDPOINTS = {"/send", "/verify"};
 
     private final CustomJwtDecoder customJwtDecoder;
 
@@ -54,7 +52,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    PasswordEncoder passwordEncoder(){
+    PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(10);
     }
 }

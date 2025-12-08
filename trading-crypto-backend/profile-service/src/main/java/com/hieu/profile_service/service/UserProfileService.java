@@ -1,5 +1,7 @@
 package com.hieu.profile_service.service;
 
+import java.util.List;
+
 import com.hieu.profile_service.constant.AccessScope;
 import com.hieu.profile_service.constant.FileType;
 import com.hieu.profile_service.dto.PageResponse;
@@ -27,8 +29,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -50,7 +50,7 @@ public class UserProfileService {
     public UserProfileResponse createProfile(ProfileCreationRequest request) {
         UserProfile userProfile = userProfileMapper.toUserProfile(request);
 
-        if(!StringUtils.hasText(request.getFullName())){
+        if (!StringUtils.hasText(request.getFullName())) {
             String suffix = RandomStringUtils.randomAlphanumeric(6).toUpperCase();
             userProfile.setFullName("Trader_" + suffix);
         }
@@ -76,11 +76,14 @@ public class UserProfileService {
     public List<UserProfileResponse> getProfilesByUserIds(List<String> userIds) {
         var userProfiles = userProfileRepository.findAllByUserIdIn(userIds);
 
-        return userProfiles.stream().map(userProfileMapper::toUserProfileResponse).toList();
+        return userProfiles.stream()
+                .map(userProfileMapper::toUserProfileResponse)
+                .toList();
     }
 
     public UserProfileResponse getProfileByUserId(String userId) {
-        UserProfile userProfile = userProfileRepository.findByUserId(userId)
+        UserProfile userProfile = userProfileRepository
+                .findByUserId(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         return userProfileMapper.toUserProfileResponse(userProfile);
@@ -90,7 +93,8 @@ public class UserProfileService {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
 
-        UserProfile userProfile = userProfileRepository.findByUserId(userId)
+        UserProfile userProfile = userProfileRepository
+                .findByUserId(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         return userProfileMapper.toUserProfileResponse(userProfile);
@@ -100,7 +104,8 @@ public class UserProfileService {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
 
-        UserProfile userProfile = userProfileRepository.findByUserId(userId)
+        UserProfile userProfile = userProfileRepository
+                .findByUserId(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         userProfileMapper.updateProfile(userProfile, request);
@@ -114,10 +119,13 @@ public class UserProfileService {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
 
-        UserProfile userProfile = userProfileRepository.findByUserId(userId)
+        UserProfile userProfile = userProfileRepository
+                .findByUserId(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-        var fileResponse = fileService.uploadMediaAWS(file, FileType.AVATAR, AccessScope.PUBLIC).getResult();
+        var fileResponse = fileService
+                .uploadMediaAWS(file, FileType.AVATAR, AccessScope.PUBLIC)
+                .getResult();
 
         if (!userProfile.getAvatarPath().equals(defaultAvatarKey)) {
             try {

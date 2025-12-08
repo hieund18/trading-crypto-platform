@@ -1,10 +1,15 @@
 package com.hieu.identity_service.service;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
 import com.hieu.identity_service.constant.OtpType;
 import com.hieu.identity_service.constant.PredefinedRole;
 import com.hieu.identity_service.dto.PageResponse;
 import com.hieu.identity_service.dto.request.*;
-import com.hieu.identity_service.dto.response.EmailVerificationOtpResponse;
 import com.hieu.identity_service.dto.response.UserResponse;
 import com.hieu.identity_service.dto.response.VerifyForgotPasswordOtpResponse;
 import com.hieu.identity_service.entity.ResetToken;
@@ -19,10 +24,7 @@ import com.hieu.identity_service.repository.RefreshTokenRepository;
 import com.hieu.identity_service.repository.ResetTokenRepository;
 import com.hieu.identity_service.repository.RoleRepository;
 import com.hieu.identity_service.repository.UserRepository;
-import com.hieu.identity_service.repository.httpclient.OtpClient;
-import com.hieu.identity_service.repository.httpclient.ProfileClient;
 import feign.FeignException;
-import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -30,29 +32,20 @@ import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
-
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
-public class  UserService {
+public class UserService {
 
     UserRepository userRepository;
     RoleRepository roleRepository;
@@ -75,7 +68,7 @@ public class  UserService {
     @Transactional
     public UserResponse createUser(UserCreationRequest request) {
 
-//        if(userRepository.existsByEmail(request.getEmail()) && is)
+        //        if(userRepository.existsByEmail(request.getEmail()) && is)
 
         User user = userMapper.toUser(request);
 
@@ -107,16 +100,16 @@ public class  UserService {
         ProfileCreationRequest profileCreationRequest = profileMapper.toProfileCreationRequest(request);
         profileCreationRequest.setUserId(user.getId());
 
-//        try {
-        var profileResponse = profileService.createProfile(profileCreationRequest).getResult();
-//        } catch (FeignException | CallNotPermittedException exception) {
-//            log.info("Error while create profile", exception);
-//            throw new AppException(ErrorCode.CANNOT_CREATE_PROFILE);
-//        }
+        //        try {
+        var profileResponse =
+                profileService.createProfile(profileCreationRequest).getResult();
+        //        } catch (FeignException | CallNotPermittedException exception) {
+        //            log.info("Error while create profile", exception);
+        //            throw new AppException(ErrorCode.CANNOT_CREATE_PROFILE);
+        //        }
 
-        WalletCreationRequest walletCreationRequest = WalletCreationRequest.builder()
-                .userId(user.getId())
-                .build();
+        WalletCreationRequest walletCreationRequest =
+                WalletCreationRequest.builder().userId(user.getId()).build();
 
         var walletResponse = walletService.createWallet(walletCreationRequest);
 
@@ -147,14 +140,11 @@ public class  UserService {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-        if (StringUtils.hasText(user.getPassword()))
-            throw new AppException(ErrorCode.PASSWORD_EXISTED);
+        if (StringUtils.hasText(user.getPassword())) throw new AppException(ErrorCode.PASSWORD_EXISTED);
 
-        if (StringUtils.hasText(user.getUsername()))
-            throw new AppException(ErrorCode.USERNAME_EXISTED);
+        if (StringUtils.hasText(user.getUsername())) throw new AppException(ErrorCode.USERNAME_EXISTED);
 
         user.setUsername(request.getUsername());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -167,8 +157,7 @@ public class  UserService {
     }
 
     public UserResponse getUser(String userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         return userMapper.toUserResponse(user);
     }
@@ -176,24 +165,24 @@ public class  UserService {
     @PreAuthorize("hasRole('ADMIN')")
     public PageResponse<UserResponse> getUsers(String keyword, Boolean isActive, Long roleId, Pageable pageable) {
 
-        Pageable pageRequest = PageRequest.of(pageable.getPageNumber()- 1, pageable.getPageSize(), pageable.getSort());
+        Pageable pageRequest = PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize(), pageable.getSort());
 
         var pageData = userRepository.searchUsers(pageRequest, isActive, keyword, roleId);
 
         return PageResponse.fromPage(pageData.map(userMapper::toUserResponse));
     }
 
-    public PageResponse<UserResponse> searchUsers(Pageable pageable, String keyword){
-        Pageable pageRequest = PageRequest.of(pageable.getPageNumber() -1, pageable.getPageSize(), pageable.getSort());
+    public PageResponse<UserResponse> searchUsers(Pageable pageable, String keyword) {
+        Pageable pageRequest = PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize(), pageable.getSort());
 
         var pageData = userRepository.findByUsernameContainingIgnoreCase(pageRequest, keyword);
 
         return PageResponse.fromPage(pageData.map(userMapper::toUserResponse));
     }
 
-    public UserResponse getUserByUsername(String username){
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+    public UserResponse getUserByUsername(String username) {
+        User user =
+                userRepository.findByUsername(username).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         return userMapper.toUserResponse(user);
     }
@@ -202,8 +191,7 @@ public class  UserService {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         UserResponse userResponse = userMapper.toUserResponse(user);
 
@@ -220,8 +208,7 @@ public class  UserService {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword()))
             throw new AppException(ErrorCode.INVALID_CURRENT_PASSWORD);
@@ -236,8 +223,7 @@ public class  UserService {
 
     @PreAuthorize("hasRole('ADMIN')")
     public UserResponse updateUserRoles(String userId, UserRoleUpdateRequest request) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         var roles = roleRepository.findAllById(request.getRoleId());
         user.setRoles(new HashSet<>(roles));
@@ -252,8 +238,7 @@ public class  UserService {
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public UserResponse updateUserStatus(String userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         user.setIsActive(!user.getIsActive());
 
@@ -271,8 +256,7 @@ public class  UserService {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         if (!StringUtils.hasText(user.getEmail()) || Boolean.FALSE.equals(user.getEmailVerified()))
             throw new AppException(ErrorCode.CANNOT_ENABLE_2FA);
@@ -287,18 +271,19 @@ public class  UserService {
 
     public void sendForgotPasswordOtp(ForgotPasswordOtpRequest request) {
 
-        User user = userRepository.findByEmail(request.getRecipient())
+        User user = userRepository
+                .findByEmail(request.getRecipient())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         if (user != null && StringUtils.hasText(user.getPassword())) {
             OtpCreationRequest otpCreationRequest = otpMapper.toOtpCreationRequest(request);
             otpCreationRequest.setOtpType(OtpType.FORGOT_PASSWORD.name());
 
-//            try {
+            //            try {
             var otpResponse = otpService.createOtp(otpCreationRequest).getResult();
-//            } catch (FeignException exception) {
-//                throw new AppException(ErrorCode.CANNOT_SEND_OTP);
-//            }
+            //            } catch (FeignException exception) {
+            //                throw new AppException(ErrorCode.CANNOT_SEND_OTP);
+            //            }
         }
     }
 
@@ -307,11 +292,11 @@ public class  UserService {
         VerifyOtpRequest verifyOtpRequest = otpMapper.toVerifyOtpRequest(request);
         verifyOtpRequest.setOtpType(OtpType.FORGOT_PASSWORD.name());
 
-//        try {
+        //        try {
         var response = otpService.verifyOtp(verifyOtpRequest).getResult();
-//        } catch (FeignException exception) {
-//            throw new AppException(ErrorCode.CANNOT_VERIFY_OTP);
-//        }
+        //        } catch (FeignException exception) {
+        //            throw new AppException(ErrorCode.CANNOT_VERIFY_OTP);
+        //        }
 
         ResetToken resetToken = ResetToken.builder()
                 .id(UUID.randomUUID().toString())
@@ -331,13 +316,14 @@ public class  UserService {
         if (!request.getNewPassword().equals(request.getConfirmPassword()))
             throw new AppException(ErrorCode.PASSWORD_NOT_MATCH);
 
-        ResetToken resetToken = resetTokenRepository.findById(request.getResetToken())
+        ResetToken resetToken = resetTokenRepository
+                .findById(request.getResetToken())
                 .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
 
-        if (!resetToken.getExpiryTime().isAfter(Instant.now()))
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        if (!resetToken.getExpiryTime().isAfter(Instant.now())) throw new AppException(ErrorCode.UNAUTHENTICATED);
 
-        User user = userRepository.findByEmail(resetToken.getEmail())
+        User user = userRepository
+                .findByEmail(resetToken.getEmail())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
@@ -348,9 +334,9 @@ public class  UserService {
         refreshTokenRepository.deleteAllByUserId(user.getId());
     }
 
-//    private boolean isEmailVerified(String email) {
-//        User user = userRepository.findByEmail(email).orElse(null);
-//
-//        return user == null || user.getEmailVerified();
-//    }
+    //    private boolean isEmailVerified(String email) {
+    //        User user = userRepository.findByEmail(email).orElse(null);
+    //
+    //        return user == null || user.getEmailVerified();
+    //    }
 }

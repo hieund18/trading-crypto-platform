@@ -7,7 +7,7 @@ spring:
     name: coin-service
   data:
     mongodb:
-      uri: mongodb://root:root@localhost:27017/coin_service?authSource=admin
+      uri: ${DBMS_CONNECTION:mongodb://root:root@localhost:27017/coin_service?authSource=admin}
       auto-index-creation: true
   redis:
     host: redis

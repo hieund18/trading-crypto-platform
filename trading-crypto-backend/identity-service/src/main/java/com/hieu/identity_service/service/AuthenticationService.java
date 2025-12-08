@@ -1,5 +1,10 @@
 package com.hieu.identity_service.service;
 
+import java.text.ParseException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+
 import com.hieu.identity_service.constant.OtpType;
 import com.hieu.identity_service.constant.PredefinedRole;
 import com.hieu.identity_service.dto.request.*;
@@ -20,7 +25,6 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-import feign.FeignException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -34,11 +38,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-
-import java.text.ParseException;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -104,16 +103,14 @@ public class AuthenticationService {
         User user = userRepository.findByUsername(input).orElse(null);
 
         if (user == null) {
-            user = userRepository.findByEmail(input)
-                    .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
+            user = userRepository.findByEmail(input).orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
         }
 
         boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
 
-        if (!authenticated)
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        if (!authenticated) throw new AppException(ErrorCode.UNAUTHENTICATED);
 
-        if(Boolean.FALSE.equals(user.getEmailVerified())){
+        if (Boolean.FALSE.equals(user.getEmailVerified())) {
             OtpCreationRequest otpCreationRequest = OtpCreationRequest.builder()
                     .recipient(user.getEmail())
                     .otpType(OtpType.EMAIL_VERIFICATION.name())
@@ -127,8 +124,7 @@ public class AuthenticationService {
                     .build();
         }
 
-        if (Boolean.FALSE.equals(user.getIsActive()))
-            throw new AppException(ErrorCode.DEACTIVATED_USER);
+        if (Boolean.FALSE.equals(user.getIsActive())) throw new AppException(ErrorCode.DEACTIVATED_USER);
 
         if (Boolean.TRUE.equals(user.getTwoFactorEnabled())) {
             OtpCreationRequest otpCreationRequest = OtpCreationRequest.builder()
@@ -136,15 +132,15 @@ public class AuthenticationService {
                     .otpType(OtpType.TWO_FACTOR_AUTH.name())
                     .build();
 
-//            try {
+            //            try {
             var otpResponse = otpService.createOtp(otpCreationRequest).getResult();
             return AuthenticationResponse.builder()
                     .recipient(user.getEmail())
                     .require2FA(true)
                     .build();
-//            } catch (FeignException exception) {
-//                throw new AppException(ErrorCode.CANNOT_SEND_OTP);
-//            }
+            //            } catch (FeignException exception) {
+            //                throw new AppException(ErrorCode.CANNOT_SEND_OTP);
+            //            }
         }
 
         String accessToken = generateAccessToken(user);
@@ -182,35 +178,33 @@ public class AuthenticationService {
             userRepository.delete(user);
         }
 
-        user = userRepository.findByGoogleAccountId(userInfo.getId())
-                .orElseGet(() -> {
-                    try {
-                        User newUser = userRepository.save(User.builder()
-                                .googleAccountId(userInfo.getId())
-                                .email(userInfo.getEmail())
-                                .emailVerified(true)
-                                .isActive(true)
-                                .twoFactorEnabled(false)
-                                .tokenVersion(0)
-                                .roles(roles)
-                                .build());
+        user = userRepository.findByGoogleAccountId(userInfo.getId()).orElseGet(() -> {
+            try {
+                User newUser = userRepository.save(User.builder()
+                        .googleAccountId(userInfo.getId())
+                        .email(userInfo.getEmail())
+                        .emailVerified(true)
+                        .isActive(true)
+                        .twoFactorEnabled(false)
+                        .tokenVersion(0)
+                        .roles(roles)
+                        .build());
 
-                        profileService.createProfile(ProfileCreationRequest.builder()
-                                .userId(newUser.getId())
-                                .fullName(userInfo.getName())
-                                .build());
+                profileService.createProfile(ProfileCreationRequest.builder()
+                        .userId(newUser.getId())
+                        .fullName(userInfo.getName())
+                        .build());
 
-                        WalletCreationRequest walletCreationRequest = WalletCreationRequest.builder()
-                                .userId(newUser.getId())
-                                .build();
+                WalletCreationRequest walletCreationRequest =
+                        WalletCreationRequest.builder().userId(newUser.getId()).build();
 
-                        var walletResponse = walletService.createWallet(walletCreationRequest);
+                var walletResponse = walletService.createWallet(walletCreationRequest);
 
-                        return newUser;
-                    } catch (DataIntegrityViolationException exception) {
-                        throw new AppException(ErrorCode.LOGIN_AND_LINK_REQUIRED);
-                    }
-                });
+                return newUser;
+            } catch (DataIntegrityViolationException exception) {
+                throw new AppException(ErrorCode.LOGIN_AND_LINK_REQUIRED);
+            }
+        });
 
         if (Boolean.FALSE.equals(user.getIsActive())) {
             throw new AppException(ErrorCode.DEACTIVATED_USER);
@@ -222,11 +216,11 @@ public class AuthenticationService {
                     .otpType(OtpType.TWO_FACTOR_AUTH.name())
                     .build();
 
-//            try {
+            //            try {
             var otpResponse = otpService.createOtp(otpCreationRequest).getResult();
-//            } catch (FeignException exception) {
-//                throw new AppException(ErrorCode.CANNOT_SEND_OTP);
-//            }
+            //            } catch (FeignException exception) {
+            //                throw new AppException(ErrorCode.CANNOT_SEND_OTP);
+            //            }
 
             return AuthenticationResponse.builder()
                     .require2FA(true)
@@ -261,54 +255,50 @@ public class AuthenticationService {
         log.info("User info: {}", userInfo);
         log.info("User email: {}", userEmail);
 
-
         String email = userEmail.stream()
                 .filter(githubEmail -> githubEmail.getPrimary() && githubEmail.getVerified())
                 .map(GithubEmailResponse::getEmail)
-                .findFirst().orElse(null);
+                .findFirst()
+                .orElse(null);
 
         log.info("Email: {}", email);
 
         User user = userRepository.findByEmail(email).orElse(null);
 
-        if (user != null && !user.getEmailVerified())
-            userRepository.delete(user);
+        if (user != null && !user.getEmailVerified()) userRepository.delete(user);
 
         Set<Role> roles = new HashSet<>();
         roleRepository.findByName(PredefinedRole.USER_ROLE).ifPresent(roles::add);
 
-        user = userRepository.findByGithubAccountId(userInfo.getId())
-                .orElseGet(() -> {
-                    try {
-                        User newUser = userRepository.save(User.builder()
-                                .githubAccountId(userInfo.getId())
-                                .email(email)
-                                .emailVerified(true)
-                                .isActive(true)
-                                .twoFactorEnabled(false)
-                                .tokenVersion(0)
-                                .roles(roles)
-                                .build());
+        user = userRepository.findByGithubAccountId(userInfo.getId()).orElseGet(() -> {
+            try {
+                User newUser = userRepository.save(User.builder()
+                        .githubAccountId(userInfo.getId())
+                        .email(email)
+                        .emailVerified(true)
+                        .isActive(true)
+                        .twoFactorEnabled(false)
+                        .tokenVersion(0)
+                        .roles(roles)
+                        .build());
 
-                        profileService.createProfile(ProfileCreationRequest.builder()
-                                .userId(newUser.getId())
-                                .fullName(userInfo.getName())
-                                .build());
+                profileService.createProfile(ProfileCreationRequest.builder()
+                        .userId(newUser.getId())
+                        .fullName(userInfo.getName())
+                        .build());
 
-                        WalletCreationRequest walletCreationRequest = WalletCreationRequest.builder()
-                                .userId(newUser.getId())
-                                .build();
+                WalletCreationRequest walletCreationRequest =
+                        WalletCreationRequest.builder().userId(newUser.getId()).build();
 
-                        var walletResponse = walletService.createWallet(walletCreationRequest);
+                var walletResponse = walletService.createWallet(walletCreationRequest);
 
-                        return newUser;
-                    } catch (DataIntegrityViolationException exception) {
-                        throw new AppException(ErrorCode.LOGIN_AND_LINK_REQUIRED);
-                    }
-                });
+                return newUser;
+            } catch (DataIntegrityViolationException exception) {
+                throw new AppException(ErrorCode.LOGIN_AND_LINK_REQUIRED);
+            }
+        });
 
-        if (Boolean.FALSE.equals(user.getIsActive()))
-            throw new AppException(ErrorCode.DEACTIVATED_USER);
+        if (Boolean.FALSE.equals(user.getIsActive())) throw new AppException(ErrorCode.DEACTIVATED_USER);
 
         if (Boolean.TRUE.equals(user.getTwoFactorEnabled())) {
             OtpCreationRequest otpCreationRequest = OtpCreationRequest.builder()
@@ -316,11 +306,11 @@ public class AuthenticationService {
                     .otpType(OtpType.TWO_FACTOR_AUTH.name())
                     .build();
 
-//            try {
+            //            try {
             var otpResponse = otpService.createOtp(otpCreationRequest).getResult();
-//            } catch (FeignException exception) {
-//                throw new AppException(ErrorCode.CANNOT_SEND_OTP);
-//            }
+            //            } catch (FeignException exception) {
+            //                throw new AppException(ErrorCode.CANNOT_SEND_OTP);
+            //            }
 
             return AuthenticationResponse.builder()
                     .require2FA(true)
@@ -342,11 +332,9 @@ public class AuthenticationService {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-        if (StringUtils.hasText(user.getGoogleAccountId()))
-            throw new AppException(ErrorCode.ACCOUNT_LINKED_GOOGLE);
+        if (StringUtils.hasText(user.getGoogleAccountId())) throw new AppException(ErrorCode.ACCOUNT_LINKED_GOOGLE);
 
         var tokenResponse = outboundIdentityClient.exchangeToken(ExchangeTokenRequest.builder()
                 .code(code)
@@ -373,11 +361,9 @@ public class AuthenticationService {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         var userId = authentication.getName();
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-        if (StringUtils.hasText(user.getGithubAccountId()))
-            throw new AppException(ErrorCode.ACCOUNT_LINKED_GITHUB);
+        if (StringUtils.hasText(user.getGithubAccountId())) throw new AppException(ErrorCode.ACCOUNT_LINKED_GITHUB);
 
         var tokenResponse = githubIdentityClient.exchangeToken(GithubTokenRequest.builder()
                 .code(code)
@@ -409,47 +395,45 @@ public class AuthenticationService {
             isValid = false;
         }
 
-        return IntrospectResponse.builder()
-                .valid(isValid)
-                .build();
+        return IntrospectResponse.builder().valid(isValid).build();
     }
 
     public void logout(LogoutRequest request) {
-        RefreshToken refreshToken = refreshTokenRepository
-                .findById(request.getRefreshToken()).orElse(null);
+        RefreshToken refreshToken =
+                refreshTokenRepository.findById(request.getRefreshToken()).orElse(null);
 
         if (refreshToken != null && refreshToken.getExpiryTime().isAfter(Instant.now()))
             refreshTokenRepository.delete(refreshToken);
 
-//        try {
-//            SignedJWT signedJWT = verifyToken(request.getToken());
-//
-//            String jti = signedJWT.getJWTClaimsSet().getJWTID();
-//            var expiryTime = signedJWT.getJWTClaimsSet().getExpirationTime();
-//
-//            InvalidatedToken invalidatedToken = InvalidatedToken.builder()
-//                    .id(jti)
-//                    .expiryTime(expiryTime.toInstant())
-//                    .build();
-//
-//            invalidatedTokenRepository.save(invalidatedToken);
-//        } catch (JOSEException | ParseException e) {
-//            log.info("Token invalid");
-//        } catch (AppException e) {
-//            log.info("Token already expired");
-//        }
+        //        try {
+        //            SignedJWT signedJWT = verifyToken(request.getToken());
+        //
+        //            String jti = signedJWT.getJWTClaimsSet().getJWTID();
+        //            var expiryTime = signedJWT.getJWTClaimsSet().getExpirationTime();
+        //
+        //            InvalidatedToken invalidatedToken = InvalidatedToken.builder()
+        //                    .id(jti)
+        //                    .expiryTime(expiryTime.toInstant())
+        //                    .build();
+        //
+        //            invalidatedTokenRepository.save(invalidatedToken);
+        //        } catch (JOSEException | ParseException e) {
+        //            log.info("Token invalid");
+        //        } catch (AppException e) {
+        //            log.info("Token already expired");
+        //        }
     }
 
     public AuthenticationResponse refreshToken(RefreshRequest request) {
         String token = request.getRefreshToken();
 
-        RefreshToken refreshToken = refreshTokenRepository.findById(token)
-                .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
+        RefreshToken refreshToken =
+                refreshTokenRepository.findById(token).orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
 
-        if (!refreshToken.getExpiryTime().isAfter(Instant.now()))
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        if (!refreshToken.getExpiryTime().isAfter(Instant.now())) throw new AppException(ErrorCode.UNAUTHENTICATED);
 
-        User user = userRepository.findById(refreshToken.getUserId())
+        User user = userRepository
+                .findById(refreshToken.getUserId())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         refreshTokenRepository.delete(refreshToken);
@@ -464,17 +448,18 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse verify2FA(TwoFactorVerifyRequest request) {
-        User user = userRepository.findByEmail(request.getRecipient())
+        User user = userRepository
+                .findByEmail(request.getRecipient())
                 .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
 
         VerifyOtpRequest verifyOtpRequest = otpMapper.toVerifyOtpRequest(request);
         verifyOtpRequest.setOtpType(OtpType.TWO_FACTOR_AUTH.name());
 
-//        try {
+        //        try {
         var response = otpService.verifyOtp(verifyOtpRequest).getResult();
-//        } catch (FeignException exception) {
-//            throw new AppException(ErrorCode.CANNOT_VERIFY_OTP);
-//        }
+        //        } catch (FeignException exception) {
+        //            throw new AppException(ErrorCode.CANNOT_VERIFY_OTP);
+        //        }
 
         String accessToken = generateAccessToken(user);
         String refreshToken = generateRefreshToken(user);
@@ -493,47 +478,47 @@ public class AuthenticationService {
             OtpCreationRequest otpCreationRequest = otpMapper.toOtpCreationRequest(request);
             otpCreationRequest.setOtpType(OtpType.TWO_FACTOR_AUTH.name());
 
-//            try {
+            //            try {
             var responseOtp = otpService.createOtp(otpCreationRequest).getResult();
-//            } catch (FeignException exception) {
-//                throw new AppException(ErrorCode.CANNOT_SEND_OTP);
-//            }
+            //            } catch (FeignException exception) {
+            //                throw new AppException(ErrorCode.CANNOT_SEND_OTP);
+            //            }
         }
     }
 
     public EmailVerificationOtpResponse sendEmailVerificationOtp(EmailVerificationOtpRequest request) {
-        User user = userRepository.findByEmail(request.getRecipient())
+        User user = userRepository
+                .findByEmail(request.getRecipient())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-        if (user.getEmailVerified())
-            throw new AppException(ErrorCode.EMAIL_VERIFIED);
+        if (user.getEmailVerified()) throw new AppException(ErrorCode.EMAIL_VERIFIED);
 
         OtpCreationRequest otpCreationRequest = otpMapper.toOtpCreationRequest(request);
         otpCreationRequest.setOtpType(OtpType.EMAIL_VERIFICATION.name());
 
-//        try {
+        //        try {
         var otpResponse = otpService.createOtp(otpCreationRequest).getResult();
         return otpMapper.toEmailVerificationOtpResponse(otpResponse);
-//        } catch (FeignException exception) {
-//            throw new AppException(ErrorCode.CANNOT_SEND_OTP);
-//        }
+        //        } catch (FeignException exception) {
+        //            throw new AppException(ErrorCode.CANNOT_SEND_OTP);
+        //        }
     }
 
     public AuthenticationResponse verifyEmail(EmailVerificationRequest request) {
-        User user = userRepository.findByEmail(request.getRecipient())
+        User user = userRepository
+                .findByEmail(request.getRecipient())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-        if (Boolean.TRUE.equals(user.getEmailVerified()))
-            throw new AppException(ErrorCode.EMAIL_VERIFIED);
+        if (Boolean.TRUE.equals(user.getEmailVerified())) throw new AppException(ErrorCode.EMAIL_VERIFIED);
 
         VerifyOtpRequest verifyOtpRequest = otpMapper.toVerifyOtpRequest(request);
         verifyOtpRequest.setOtpType(OtpType.EMAIL_VERIFICATION.name());
 
-//        try {
+        //        try {
         var response = otpService.verifyOtp(verifyOtpRequest).getResult();
-//        } catch (FeignException exception) {
-//            throw new AppException(ErrorCode.CANNOT_VERIFY_OTP);
-//        }
+        //        } catch (FeignException exception) {
+        //            throw new AppException(ErrorCode.CANNOT_VERIFY_OTP);
+        //        }
 
         user.setEmailVerified(true);
         user.setIsActive(true);
@@ -611,13 +596,13 @@ public class AuthenticationService {
         boolean verified = signedJWT.verify(jwsVerifier);
         var expiryTime = signedJWT.getJWTClaimsSet().getExpirationTime();
 
-        if (!(verified && expiryTime.after(new Date())))
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        if (!(verified && expiryTime.after(new Date()))) throw new AppException(ErrorCode.UNAUTHENTICATED);
 
-//        if (invalidatedTokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID()))
-//            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        //        if (invalidatedTokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID()))
+        //            throw new AppException(ErrorCode.UNAUTHENTICATED);
 
-        User user = userRepository.findById(signedJWT.getJWTClaimsSet().getSubject())
+        User user = userRepository
+                .findById(signedJWT.getJWTClaimsSet().getSubject())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         if (user.getTokenVersion() != signedJWT.getJWTClaimsSet().getLongClaim("version"))
@@ -626,17 +611,17 @@ public class AuthenticationService {
         return signedJWT;
     }
 
-//    private String maskEmail(String email){
-//        var parts = email.split("@");
-//        var local = parts[0];
-//        var domain = parts[1];
-//
-//        if(local.length() <= 2)
-//            return "***@" + domain;
-//
-//        String prefix = local.substring(0, 2);
-//        String suffix = local.substring(local.length() - 2);
-//
-//        return prefix + "***" + suffix + "@" + domain;
-//    }
+    //    private String maskEmail(String email){
+    //        var parts = email.split("@");
+    //        var local = parts[0];
+    //        var domain = parts[1];
+    //
+    //        if(local.length() <= 2)
+    //            return "***@" + domain;
+    //
+    //        String prefix = local.substring(0, 2);
+    //        String suffix = local.substring(local.length() - 2);
+    //
+    //        return prefix + "***" + suffix + "@" + domain;
+    //    }
 }

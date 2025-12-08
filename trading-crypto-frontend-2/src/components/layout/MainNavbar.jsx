@@ -1,3 +1,4 @@
+// src/components/layout/MainNavbar.jsx
 import React from "react";
 import {
   AppBar,
@@ -6,30 +7,24 @@ import {
   Box,
   Link,
   IconButton,
-  // Xóa: Avatar, Menu, MenuItem, Divider, ListItemIcon
 } from "@mui/material";
 
 import { Link as RouterLink, NavLink, useNavigate } from "react-router-dom";
 import Logo from "../common/Logo";
 import { useAuth } from "../../context/AuthContext";
 import CoinSearchBar from "../navbar/CoinSearchBar";
-import UserMenu from "../navbar/UserMenu"; // <-- IMPORT COMPONENT MỚI
+import UserMenu from "../navbar/UserMenu"; 
 
-// 1. IMPORT CÁC ICON MỚI
 import { useThemeContext } from "../../context/ThemeContext";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import StarBorderRoundedIcon from "@mui/icons-material/StarBorderRounded";
-// Xóa: Các icon của Menu (đã chuyển sang UserMenu.jsx)
 
 export default function MainNavbar() {
-  // Chỉ giữ lại user và loading
   const { user, loading } = useAuth();
   const { mode, toggleTheme } = useThemeContext();
 
-  if (loading) return null; // Ngăn flash
-
-  // Xóa: Toàn bộ state và handler của Menu (đã chuyển đi)
+  if (loading) return null;
 
   const activeStyle = {
     fontWeight: 600,
@@ -45,11 +40,11 @@ export default function MainNavbar() {
     },
   };
 
-  // Sửa lại navLinks (bỏ Giao dịch, sửa tên Danh mục)
+  // 🔥 1. ĐÃ XÓA MỤC "Dashboard"
   const navLinks = [
     { title: "Thị trường", to: "/markets" },
     { title: "Giao dịch", to: "/trade/bitcoin" },
-    { title: "Dashboard", to: "/dashboard" },
+    // { title: "Dashboard", to: "/dashboard" }, // <--- ĐÃ BỎ
     { title: "Danh mục đầu tư", to: "/portfolio" },
     { title: "Ví", to: "/wallet" },
     { title: "Bảng xếp hạng", to: "/leaderboard" },
@@ -60,9 +55,10 @@ export default function MainNavbar() {
       position="sticky"
       elevation={0}
       sx={{
-        bgcolor: "background.paper",
-        borderBottom: "1px solid",
-        borderColor: "divider",
+        bgcolor: "background.default",
+        // 🔥 2. ĐÃ BỎ VIỀN KẺ DƯỚI
+        // borderBottom: "1px solid", 
+        // borderColor: "divider",
       }}
     >
       <Toolbar
@@ -118,12 +114,10 @@ export default function MainNavbar() {
                 Danh sách theo dõi
               </Button>
 
-              {/* GỌI COMPONENT MỚI Ở ĐÂY */}
               <UserMenu />
             </React.Fragment>
           ) : (
             <React.Fragment>
-              {/* ... Nút Login / Register ... */}
               <Button
                 component={RouterLink}
                 to="/login"
@@ -148,7 +142,6 @@ export default function MainNavbar() {
             </React.Fragment>
           )}
 
-          {/* SỬA: Thêm &:hover cho nút Theme */}
           <IconButton
             onClick={toggleTheme}
             sx={{

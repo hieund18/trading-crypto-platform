@@ -1,6 +1,8 @@
 package com.hieu.identity_service.service;
 
-import com.hieu.identity_service.constant.PredefinedRole;
+import java.util.HashSet;
+import java.util.List;
+
 import com.hieu.identity_service.dto.PageResponse;
 import com.hieu.identity_service.dto.request.RoleRequest;
 import com.hieu.identity_service.dto.response.RoleResponse;
@@ -17,14 +19,9 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -54,7 +51,7 @@ public class RoleService {
     @PreAuthorize("hasRole('ADMIN')")
     public PageResponse<RoleResponse> getRoles(String name, Pageable pageable) {
 
-        Pageable pageRequest = PageRequest.of(pageable.getPageNumber() -1, pageable.getPageSize(), pageable.getSort());
+        Pageable pageRequest = PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize(), pageable.getSort());
 
         var pageData = roleRepository.findByNameContainingIgnoreCase(name, pageRequest);
 
@@ -62,12 +59,11 @@ public class RoleService {
     }
 
     public RoleResponse updateRole(Long roleId, RoleRequest request) {
-        Role role = roleRepository.findById(roleId)
-                .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTED));
+        Role role = roleRepository.findById(roleId).orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTED));
 
-//        String roleName = role.getName();
-//        if (roleName.equals(PredefinedRole.ADMIN_ROLE) || roleName.equals(PredefinedRole.USER_ROLE))
-//            throw new AppException(ErrorCode.CANNOT_UPDATE_SYSTEM_ROLE);
+        //        String roleName = role.getName();
+        //        if (roleName.equals(PredefinedRole.ADMIN_ROLE) || roleName.equals(PredefinedRole.USER_ROLE))
+        //            throw new AppException(ErrorCode.CANNOT_UPDATE_SYSTEM_ROLE);
 
         roleMapper.updateRole(role, request);
 

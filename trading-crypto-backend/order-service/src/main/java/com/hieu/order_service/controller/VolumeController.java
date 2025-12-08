@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -25,8 +26,8 @@ public class VolumeController {
 
     @GetMapping("/ranking/users")
     ApiResponse<List<UserVolumeRankingResponse>> getUserVolumeRanking(
-            @RequestParam LocalDate from,
-            @RequestParam LocalDate to
+            @RequestParam Instant from,
+            @RequestParam Instant to
     ) {
         return ApiResponse.<List<UserVolumeRankingResponse>>builder()
                 .result(volumeService.getUserVolumeRanking(from, to))
@@ -35,8 +36,8 @@ public class VolumeController {
 
     @GetMapping("/ranking/coins")
     ApiResponse<List<CoinVolumeRankingResponse>> getCoinVolumeRanking(
-            @RequestParam LocalDate from,
-            @RequestParam LocalDate to
+            @RequestParam Instant from,
+            @RequestParam Instant to
     ) {
         return ApiResponse.<List<CoinVolumeRankingResponse>>builder()
                 .result(volumeService.getCoinVolumeRanking(from, to))
@@ -46,8 +47,8 @@ public class VolumeController {
     @GetMapping("/chart")
     ApiResponse<List<TradeVolumeByTimeResponse>> getVolumeChart(
             @RequestParam String timeType,
-            @RequestParam LocalDate from,
-            @RequestParam LocalDate to
+            @RequestParam Instant from,
+            @RequestParam Instant to
     ) {
         return ApiResponse.<List<TradeVolumeByTimeResponse>>builder()
                 .result(volumeService.getVolumeChart(timeType, from, to))

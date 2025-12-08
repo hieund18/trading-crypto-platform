@@ -1,5 +1,7 @@
 package com.hieu.profile_service.configuration;
 
+import java.io.IOException;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hieu.profile_service.dto.ApiResponse;
 import com.hieu.profile_service.exception.AppException;
@@ -8,8 +10,6 @@ import feign.Response;
 import feign.Util;
 import feign.codec.ErrorDecoder;
 import lombok.extern.slf4j.Slf4j;
-
-import java.io.IOException;
 
 @Slf4j
 public class CustomFeignErrorDecoder implements ErrorDecoder {
@@ -32,8 +32,7 @@ public class CustomFeignErrorDecoder implements ErrorDecoder {
 
     private ErrorCode fromCode(int code) {
         for (ErrorCode errorCode : ErrorCode.values()) {
-            if (code == errorCode.getCode())
-                return errorCode;
+            if (code == errorCode.getCode()) return errorCode;
         }
 
         return ErrorCode.UNCATEGORIZED_EXCEPTION;

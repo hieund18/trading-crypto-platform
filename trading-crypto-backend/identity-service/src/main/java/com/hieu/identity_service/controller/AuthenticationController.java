@@ -89,7 +89,8 @@ public class AuthenticationController {
     }
 
     @PostMapping("/verify-email/send-otp")
-    ApiResponse<EmailVerificationOtpResponse> sendEmailVerificationOtp(@RequestBody EmailVerificationOtpRequest request) {
+    ApiResponse<EmailVerificationOtpResponse> sendEmailVerificationOtp(
+            @RequestBody EmailVerificationOtpRequest request) {
         return ApiResponse.<EmailVerificationOtpResponse>builder()
                 .result(authenticationService.sendEmailVerificationOtp(request))
                 .build();

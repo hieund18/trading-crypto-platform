@@ -1,9 +1,9 @@
 package com.hieu.otp_service.dto.request;
 
+import java.util.Map;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.Map;
 
 @Data
 @Builder

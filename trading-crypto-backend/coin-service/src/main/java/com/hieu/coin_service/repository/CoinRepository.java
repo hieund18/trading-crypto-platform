@@ -1,15 +1,14 @@
 package com.hieu.coin_service.repository;
 
+import java.util.List;
+import java.util.Optional;
+
 import com.hieu.coin_service.entity.Coin;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface CoinRepository extends MongoRepository<Coin, String> {
@@ -20,13 +19,13 @@ public interface CoinRepository extends MongoRepository<Coin, String> {
 
     List<Coin> findByIdInAndIsActiveTrue(List<String> ids);
 
-    @Query("{ " +
-            "  $or: [ " +
-            "    { 'name': { $regex: ?0, $options: 'i' } }, " +
-            "    { 'symbol': { $regex: ?0, $options: 'i' } } " +
-            "  ], " +
-            "  'isActive': ?#{ [1] != null ? [1] : { $exists: true } } " +
-            "}")
+    @Query("{ " + "  $or: [ "
+            + "    { 'name': { $regex: ?0, $options: 'i' } }, "
+            + "    { 'symbol': { $regex: ?0, $options: 'i' } } "
+            + "    { 'binanceSymbol': { $regex: ?0, $options: 'i' } } "
+            + "  ], "
+            + "  'isActive': ?#{ [1] != null ? [1] : { $exists: true } } "
+            + "}")
     Page<Coin> search(String keyword, Boolean isActive, Pageable pageable);
 
     List<Coin> findByIsActiveTrue();

@@ -1,5 +1,7 @@
 package com.hieu.profile_service.controller;
 
+import java.util.List;
+
 import com.hieu.profile_service.dto.ApiResponse;
 import com.hieu.profile_service.dto.request.ProfileCreationRequest;
 import com.hieu.profile_service.dto.response.UserProfileResponse;
@@ -9,8 +11,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/internal/users")

@@ -14,6 +14,7 @@ import org.springframework.data.mongodb.core.mapping.MongoId;
 public class FileManagement {
     @MongoId
     String id;
+
     String ownerId;
     String contentType;
     long size;

@@ -12,11 +12,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -28,33 +26,20 @@ import java.util.stream.Collectors;
 public class VolumeService {
     TradeHistoryRepository tradeHistoryRepository;
 
-    public List<UserVolumeRankingResponse> getUserVolumeRanking(LocalDate from, LocalDate to) {
-        Instant start = from.atStartOfDay(ZoneOffset.UTC).toInstant();
-        Instant end = to.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
-
-        List<UserVolumeRankingResponse> list = tradeHistoryRepository.getUserRanking(start, end);
-
-        return list;
+    public List<UserVolumeRankingResponse> getUserVolumeRanking(Instant from, Instant to) {
+        return tradeHistoryRepository.getUserRanking(from, to);
     }
 
-    public List<CoinVolumeRankingResponse> getCoinVolumeRanking(LocalDate from, LocalDate to) {
-        Instant start = from.atStartOfDay(ZoneOffset.UTC).toInstant();
-        Instant end = to.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
-
-        List<CoinVolumeRankingResponse> list = tradeHistoryRepository.getCoinRanking(start, end);
-
-        return list;
+    public List<CoinVolumeRankingResponse> getCoinVolumeRanking(Instant from, Instant to) {
+        return tradeHistoryRepository.getCoinRanking(from, to);
     }
 
-    public List<TradeVolumeByTimeResponse> getVolumeChart(String typeTime, LocalDate from, LocalDate to) {
-        Instant start = from.atStartOfDay(ZoneOffset.UTC).toInstant();
-        Instant end = to.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
-
+    public List<TradeVolumeByTimeResponse> getVolumeChart(String typeTime, Instant from, Instant to) {
         List<TradeVolumeByTimeResponse> dbList;
         switch (typeTime.toUpperCase()) {
-            case "HOUR" -> dbList = map(tradeHistoryRepository.volumeByHour(start, end));
-            case "DAY" -> dbList = map(tradeHistoryRepository.volumeByDay(start, end));
-            case "MONTH" -> dbList = map(tradeHistoryRepository.volumeByMonth(start, end));
+            case "HOUR" -> dbList = map(tradeHistoryRepository.volumeByHour(from, to));
+            case "DAY" -> dbList = map(tradeHistoryRepository.volumeByDay(from, to));
+            case "MONTH" -> dbList = map(tradeHistoryRepository.volumeByMonth(from, to));
             default -> throw new AppException(ErrorCode.INVALID_TIME_TYPE);
         }
         ;
@@ -83,81 +68,65 @@ public class VolumeService {
     }
 
     public List<TradeVolumeByTimeResponse> fillHour(
-            LocalDate from, LocalDate to, Map<String, TradeVolumeByTimeResponse> map
+            Instant from, Instant to, Map<String, TradeVolumeByTimeResponse> map
     ) {
         List<TradeVolumeByTimeResponse> result = new ArrayList<>();
-
-        LocalDateTime start = from.atStartOfDay();
-        LocalDateTime end = to.plusDays(1).atStartOfDay();
-
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:00");
 
-        LocalDateTime cur = start;
-        while (cur.isBefore(end)) {
-            String key = cur.format(formatter);
+        // Chuyển sang ZonedDateTime UTC để tính toán cộng giờ chính xác
+        ZonedDateTime current = from.atZone(ZoneOffset.UTC).truncatedTo(ChronoUnit.HOURS);
+        ZonedDateTime end = to.atZone(ZoneOffset.UTC);
 
-            result.add(
-                    map.getOrDefault(
-                            key,
-                            TradeVolumeByTimeResponse.builder()
-                                    .period(key)
-                                    .totalVolume(0.0)
-                                    .transactionCount(0L)
-                                    .build()
-                    )
-            );
-            cur = cur.plusHours(1);
+        while (current.isBefore(end)) {
+            String key = current.format(formatter);
+            result.add(map.getOrDefault(key, createEmpty(key)));
+            current = current.plusHours(1);
         }
         return result;
     }
 
     public List<TradeVolumeByTimeResponse> fillDay(
-            LocalDate from, LocalDate to, Map<String, TradeVolumeByTimeResponse> map
+            Instant from, Instant to, Map<String, TradeVolumeByTimeResponse> map
     ) {
         List<TradeVolumeByTimeResponse> result = new ArrayList<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        LocalDate cur = from;
-        while (!cur.isAfter(to)) {
-            String key = cur.toString();
-            result.add(
-                    map.getOrDefault(
-                            key,
-                            TradeVolumeByTimeResponse.builder()
-                                    .period(key)
-                                    .totalVolume(0.0)
-                                    .transactionCount(0L)
-                                    .build()
-                    )
-            );
-            cur = cur.plusDays(1);
+        ZonedDateTime current = from.atZone(ZoneOffset.UTC).truncatedTo(ChronoUnit.DAYS);
+        ZonedDateTime end = to.atZone(ZoneOffset.UTC);
+
+        while (current.isBefore(end)) {
+            String key = current.format(formatter);
+            result.add(map.getOrDefault(key, createEmpty(key)));
+            current = current.plusDays(1);
         }
         return result;
     }
 
     public List<TradeVolumeByTimeResponse> fillMonth(
-            LocalDate from, LocalDate to, Map<String, TradeVolumeByTimeResponse> map
+            Instant from, Instant to, Map<String, TradeVolumeByTimeResponse> map
     ) {
         List<TradeVolumeByTimeResponse> result = new ArrayList<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
 
-        LocalDate cur = LocalDate.of(from.getYear(), from.getMonth(), 1);
-        LocalDate end = LocalDate.of(to.getYear(), to.getMonth(), 1);
+        // Đưa về ngày đầu tháng để lặp cho đúng
+        ZonedDateTime current = from.atZone(ZoneOffset.UTC).withDayOfMonth(1).truncatedTo(ChronoUnit.DAYS);
+        ZonedDateTime end = to.atZone(ZoneOffset.UTC);
 
-        while (!cur.isAfter(end)) {
-            String key = cur.format(DateTimeFormatter.ofPattern("yyyy-MM"));
-
-            result.add(
-                    map.getOrDefault(
-                            key,
-                            TradeVolumeByTimeResponse.builder()
-                                    .period(key)
-                                    .totalVolume(0.0)
-                                    .transactionCount(0L)
-                                    .build()
-                    )
-            );
-            cur = cur.plusMonths(1);
+        // Lặp cho đến khi vượt qua thời gian kết thúc
+        // (Hoặc dùng !current.isAfter(end) nếu muốn bao gồm cả tháng cuối cùng trọn vẹn)
+        while (current.isBefore(end)) {
+            String key = current.format(formatter);
+            result.add(map.getOrDefault(key, createEmpty(key)));
+            current = current.plusMonths(1);
         }
         return result;
     }
 
+    private TradeVolumeByTimeResponse createEmpty(String period) {
+        return TradeVolumeByTimeResponse.builder()
+                .period(period)
+                .totalVolume(0.0)
+                .transactionCount(0L)
+                .build();
+    }
 }

@@ -14,6 +14,6 @@ import java.math.BigDecimal;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DepositRequest {
     @NotNull(message = "AMOUNT_IS_REQUIRED")
-    @DecimalMin(value = "10000", message = "INVALID_AMOUNT")
+    @DecimalMin(value = "0", message = "INVALID_AMOUNT")
     BigDecimal amount;
 }

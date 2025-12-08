@@ -1,5 +1,8 @@
 package com.hieu.identity_service.scheduler;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 import com.hieu.identity_service.entity.User;
 import com.hieu.identity_service.repository.UserRepository;
@@ -11,10 +14,6 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
 
 @Component
 @Slf4j

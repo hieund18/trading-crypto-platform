@@ -18,7 +18,6 @@ public enum ErrorCode {
     INVALID_OTP(1007, "Invalid OTP", HttpStatus.BAD_REQUEST),
     OTP_EXPIRED(1008, "OTP expired", HttpStatus.BAD_REQUEST),
     OTP_ATTEMPT_LIMIT_EXCEEDED(1009, "OTP attempt limit exceeded", HttpStatus.TOO_MANY_REQUESTS),
-
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

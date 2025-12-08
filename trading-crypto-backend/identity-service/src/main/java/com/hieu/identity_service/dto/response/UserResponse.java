@@ -1,11 +1,11 @@
 package com.hieu.identity_service.dto.response;
 
+import java.time.Instant;
+import java.util.Set;
+
 import com.hieu.identity_service.entity.Role;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.time.Instant;
-import java.util.Set;
 
 @Data
 @Builder

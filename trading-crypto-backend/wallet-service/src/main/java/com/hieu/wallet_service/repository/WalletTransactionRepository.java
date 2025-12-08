@@ -20,4 +20,25 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
             @Param("userId") String userId,
             @Param("type") String type
     );
+
+    @Query("""
+    SELECT w FROM WalletTransaction w
+    WHERE 
+        (
+            :keyword IS NULL 
+            OR :keyword = '' 
+            OR w.userId = :keyword
+            OR w.id = :keyword
+        )
+        AND (
+            :type IS NULL 
+            OR :type = '' 
+            OR w.type LIKE CONCAT(:type, '%')
+        )
+    """)
+    Page<WalletTransaction> searchTransactions(
+            Pageable pageable,
+            @Param("keyword") String keyword,
+            @Param("type") String type
+    );
 }

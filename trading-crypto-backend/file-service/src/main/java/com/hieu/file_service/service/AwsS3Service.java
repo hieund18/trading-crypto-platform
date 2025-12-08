@@ -1,5 +1,10 @@
 package com.hieu.file_service.service;
 
+import java.io.IOException;
+import java.time.Duration;
+import java.util.Objects;
+import java.util.UUID;
+
 import com.hieu.file_service.constant.AccessScope;
 import com.hieu.file_service.constant.FileType;
 import com.hieu.file_service.dto.FileInfo;
@@ -23,11 +28,6 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
-
-import java.io.IOException;
-import java.time.Duration;
-import java.util.Objects;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -56,9 +56,8 @@ public class AwsS3Service {
         log.info("Uploading to s3...");
         String fileExtension = StringUtils.getFilenameExtension(file.getOriginalFilename());
 
-        String fileName = Objects.isNull(fileExtension)
-                ? UUID.randomUUID().toString()
-                : UUID.randomUUID() + "." + fileExtension;
+        String fileName =
+                Objects.isNull(fileExtension) ? UUID.randomUUID().toString() : UUID.randomUUID() + "." + fileExtension;
 
         String accessLevel = accessScope == AccessScope.PUBLIC ? publicDir : privateDir;
         String key = accessLevel + fileType.getFolder() + fileName;
@@ -75,10 +74,9 @@ public class AwsS3Service {
 
         s3Client.putObject(request, RequestBody.fromBytes(data));
 
-        String url = s3Client.utilities().getUrl(GetUrlRequest.builder()
-                .bucket(bucketName)
-                .key(key)
-                .build()).toString();
+        String url = s3Client.utilities()
+                .getUrl(GetUrlRequest.builder().bucket(bucketName).key(key).build())
+                .toString();
 
         return FileInfo.builder()
                 .name(fileName)
@@ -123,7 +121,7 @@ public class AwsS3Service {
 
         String newFolder = newLevel.equals(AccessScope.PUBLIC.name()) ? publicDir : privateDir;
         String oldFolder = fileManagement.getAccessLevel().toLowerCase() + "/";
-//        String newKey = folder + fileManagement.getId();
+        //        String newKey = folder + fileManagement.getId();
         String newKey = fileManagement.getPath().replace(oldFolder, newFolder);
 
         CopyObjectRequest copyObjectRequest = CopyObjectRequest.builder()
@@ -135,15 +133,11 @@ public class AwsS3Service {
 
         s3Client.copyObject(copyObjectRequest);
 
-        String url = s3Client.utilities().getUrl(GetUrlRequest.builder()
-                .bucket(bucketName)
-                .key(newKey)
-                .build()).toString();
+        String url = s3Client.utilities()
+                .getUrl(GetUrlRequest.builder().bucket(bucketName).key(newKey).build())
+                .toString();
 
-        return FileInfo.builder()
-                .path(newKey)
-                .url(url)
-                .build();
+        return FileInfo.builder().path(newKey).url(url).build();
     }
 
     @CircuitBreaker(name = "awsS3Service", fallbackMethod = "fallBackDeleteFile")
@@ -157,22 +151,22 @@ public class AwsS3Service {
         s3Client.deleteObject(deleteObjectRequest);
     }
 
-    public FileInfo fallBackUploadFile(MultipartFile file, FileType fileType, AccessScope accessScope, Throwable ex){
+    public FileInfo fallBackUploadFile(MultipartFile file, FileType fileType, AccessScope accessScope, Throwable ex) {
         log.info("Fallback: S3 service exception", ex);
         throw new AppException(ErrorCode.CANNOT_UPLOAD_FILE);
     }
 
-    public String fallBackGetUrl(FileManagement fileManagement, Throwable ex){
+    public String fallBackGetUrl(FileManagement fileManagement, Throwable ex) {
         log.info("Fallback: S3 service exception", ex);
         throw new AppException(ErrorCode.CANNOT_GET_URL);
     }
 
-    public FileInfo fallBackCopyFile(FileManagement fileManagement, String newLevel, Throwable ex){
+    public FileInfo fallBackCopyFile(FileManagement fileManagement, String newLevel, Throwable ex) {
         log.info("Fallback: S3 service exception", ex);
         throw new AppException(ErrorCode.CANNOT_UPDATE_ACCESS_LEVEL);
     }
 
-    public void fallBackDeleteFile(FileManagement fileManagement, Throwable ex){
+    public void fallBackDeleteFile(FileManagement fileManagement, Throwable ex) {
         log.info("Fallback: S3 service exception", ex);
         throw new AppException(ErrorCode.CANNOT_DELETE_FILE);
     }

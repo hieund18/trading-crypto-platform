@@ -16,9 +16,8 @@ import org.springframework.stereotype.Component;
 public class CoinUpdateController {
     BinanceTickerListener binanceTickerListener;
 
-    @KafkaListener(topics = "coin-update",
-            groupId = "#{T(java.util.UUID).randomUUID().toString()}")
-    public void listenCoinUpdate(CoinUpdateEvent message){
+    @KafkaListener(topics = "coin-update", groupId = "#{T(java.util.UUID).randomUUID().toString()}")
+    public void listenCoinUpdate(CoinUpdateEvent message) {
         log.info("Message: {}", message);
 
         binanceTickerListener.loadSupportedSymbols();

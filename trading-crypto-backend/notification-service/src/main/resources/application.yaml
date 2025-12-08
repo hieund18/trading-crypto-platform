@@ -24,8 +24,8 @@ notification:
       url: https://api.sendgrid.com
       apikey: ${OUTBOUND_SENDGRID_APIKEY}
     sender:
-      email: hieund.work@proton.me
-      name: BitStorm
+      email: no-reply@bitstorm.store
+      name: Bitstorm
 
 resilience4j:
   retry:

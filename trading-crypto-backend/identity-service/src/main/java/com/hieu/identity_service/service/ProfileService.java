@@ -29,7 +29,8 @@ public class ProfileService {
         return profileClient.createProfile(request);
     }
 
-    public ApiResponse<UserProfileResponse> fallBackCreateProfile(ProfileCreationRequest request, Throwable ex) {// Throwable ex bat tat ca loi ke ca ignore exception
+    public ApiResponse<UserProfileResponse> fallBackCreateProfile(
+            ProfileCreationRequest request, Throwable ex) { // Throwable ex bat tat ca loi ke ca ignore exception
         if (ex instanceof AppException) {
             throw (AppException) ex;
         }
@@ -39,13 +40,13 @@ public class ProfileService {
     }
 
     @Retry(name = "profileService", fallbackMethod = "")
-    public ApiResponse<Void> deleteProfileByUserId(String userId){
+    public ApiResponse<Void> deleteProfileByUserId(String userId) {
         log.info("Calling delete profile");
         return profileClient.deleteProfileByUserId(userId);
     }
 
-//    public ApiResponse<Void> fallBackDeleteProfile(String userId, Throwable ex){
-//        log.error("Fallback: Profile service unavailable ", ex);
-//        return ApiResponse.<Void>builder().build();
-//    }
+    //    public ApiResponse<Void> fallBackDeleteProfile(String userId, Throwable ex){
+    //        log.error("Fallback: Profile service unavailable ", ex);
+    //        return ApiResponse.<Void>builder().build();
+    //    }
 }

@@ -15,8 +15,7 @@ import SocialLogin from "../../components/auth/SocialLogin";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
-// 1. IMPORT useLocation
-import { useNavigate, useLocation } from "react-router-dom"; // <-- Thêm useLocation
+import { useNavigate, useLocation } from "react-router-dom"; 
 import { useAuth } from "../../context/AuthContext";
 import { loginApi } from "../../api/authApi";
 import { setToken, setRefreshToken } from "../../api/tokenUtils";
@@ -32,7 +31,7 @@ const schema = yup.object({
 
 export default function Login() {
   const nav = useNavigate();
-  const location = useLocation(); // 2. Lấy location
+  const location = useLocation(); 
   const { login } = useAuth();
   const [apiError, setApiError] = useState("");
   const { toastSuccess, toastError, toastInfo } = useToast();
@@ -77,18 +76,16 @@ export default function Login() {
 
       toastSuccess("Đăng nhập thành công!");
 
-      // 3. LOGIC CHUYỂN HƯỚNG QUAY LẠI TRANG CŨ
-      // Kiểm tra xem có 'state.from' được gửi tới không
+      // LOGIC CHUYỂN HƯỚNG
       if (location.state?.from) {
-        // Nếu có, chuyển về trang đó (ví dụ: /trade/bitcoin)
         nav(location.state.from.pathname + location.state.from.search);
       } else {
-        // Nếu không (login bình thường), check Role như cũ
         const roles = userInfo.roles?.map((r) => r.name) || [];
         if (roles.includes("ADMIN")) {
           nav("/admin");
         } else {
-          nav("/dashboard");
+          // 🔥 3. CHUYỂN ĐẾN TRANG THỊ TRƯỜNG THAY VÌ DASHBOARD
+          nav("/markets"); 
         }
       }
     } catch (err) {

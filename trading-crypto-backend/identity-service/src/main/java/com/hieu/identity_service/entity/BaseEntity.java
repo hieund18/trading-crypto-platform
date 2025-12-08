@@ -1,5 +1,7 @@
 package com.hieu.identity_service.entity;
 
+import java.time.Instant;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PrePersist;
@@ -7,8 +9,6 @@ import jakarta.persistence.PreUpdate;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
-
-import java.time.Instant;
 
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)

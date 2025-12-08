@@ -31,8 +31,7 @@ public class OtpService {
     }
 
     public ApiResponse<OtpResponse> fallBackCreateOtp(OtpCreationRequest request, Throwable ex) {
-        if (ex instanceof AppException)
-            throw (AppException) ex;
+        if (ex instanceof AppException) throw (AppException) ex;
 
         log.error("Fallback: Otp service unavailable", ex);
         throw new AppException(ErrorCode.CANNOT_SEND_OTP);
@@ -46,8 +45,7 @@ public class OtpService {
     }
 
     public ApiResponse<VerifyOtpResponse> fallBackVerifyOtp(VerifyOtpRequest request, Throwable ex) {
-        if(ex instanceof AppException)
-            throw (AppException) ex;
+        if (ex instanceof AppException) throw (AppException) ex;
 
         log.error("Fallback: Otp service unavailable", ex);
         throw new AppException(ErrorCode.CANNOT_VERIFY_OTP);

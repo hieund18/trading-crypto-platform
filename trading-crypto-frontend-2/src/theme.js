@@ -76,7 +76,7 @@ export const getThemeConfig = (mode) => {
           // DARK MODE
           background: {
             default: "#181A20",
-            paper: "#0E0F14",
+            paper: "#181A20",
             popup: "#1e2328ff",
           },
           //primary: { main: "#FCD535", contrastText: "#181A20" }, // 🔥 Đổi Primary sang Vàng Binance (nếu thích) hoặc giữ xanh #3b82f6

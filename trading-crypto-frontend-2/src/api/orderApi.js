@@ -39,3 +39,24 @@ export async function getMyTradeHistoryApi(params) {
   const res = await api.get("/order/assets/my-trade-history", { params });
   return res.data;
 }
+
+// 🔥 API Lấy dữ liệu biểu đồ Volume (MỚI)
+export async function getVolumeChartApi(params) {
+  // params: { timeType: "HOUR" | "DAY" | "MONTH", from: "YYYY-MM-DD", to: "YYYY-MM-DD" }
+  const res = await api.get("/order/volume/chart", { params });
+  return res.data;
+}
+
+// 🔥 API Top Users theo Volume
+export async function getTopUsersVolumeApi(params) {
+  // params: { from, to }
+  const res = await api.get("/order/volume/ranking/users", { params });
+  return res.data;
+}
+
+// 🔥 API Top Coins theo Volume
+export async function getTopCoinsVolumeApi(params) {
+  // params: { from, to }
+  const res = await api.get("/order/volume/ranking/coins", { params });
+  return res.data;
+}

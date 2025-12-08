@@ -1,12 +1,12 @@
 package com.hieu.profile_service.configuration;
 
+import java.text.ParseException;
+
 import com.nimbusds.jwt.SignedJWT;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Component;
-
-import java.text.ParseException;
 
 @Component
 public class CustomJwtDecoder implements JwtDecoder {
@@ -15,7 +15,8 @@ public class CustomJwtDecoder implements JwtDecoder {
         try {
             SignedJWT signedJWT = SignedJWT.parse(token);
 
-            return new Jwt(token,
+            return new Jwt(
+                    token,
                     signedJWT.getJWTClaimsSet().getIssueTime().toInstant(),
                     signedJWT.getJWTClaimsSet().getExpirationTime().toInstant(),
                     signedJWT.getHeader().toJSONObject(),

@@ -3,7 +3,6 @@ package com.hieu.identity_service.controller;
 import com.hieu.identity_service.dto.ApiResponse;
 import com.hieu.identity_service.dto.PageResponse;
 import com.hieu.identity_service.dto.request.*;
-import com.hieu.identity_service.dto.response.EmailVerificationOtpResponse;
 import com.hieu.identity_service.dto.response.UserResponse;
 import com.hieu.identity_service.dto.response.VerifyForgotPasswordOtpResponse;
 import com.hieu.identity_service.service.UserService;
@@ -12,7 +11,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.shaded.com.google.protobuf.Api;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -62,20 +60,18 @@ public class UserController {
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) Boolean isActive,
             @RequestParam(required = false) Long roleId,
-            @PageableDefault(page = 1, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
-    ) {
+            @PageableDefault(page = 1, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         authentication.getAuthorities().forEach(grantedAuthority -> log.info(grantedAuthority.getAuthority()));
         return ApiResponse.<PageResponse<UserResponse>>builder()
-                .result(userService.getUsers(keyword, isActive, roleId,pageable))
+                .result(userService.getUsers(keyword, isActive, roleId, pageable))
                 .build();
     }
 
     @GetMapping("/search")
     ApiResponse<PageResponse<UserResponse>> searchUsers(
             @PageableDefault(page = 1, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
-            @RequestParam(required = false, defaultValue = "") String keyword
-    ) {
+            @RequestParam(required = false, defaultValue = "") String keyword) {
         return ApiResponse.<PageResponse<UserResponse>>builder()
                 .result(userService.searchUsers(pageable, keyword))
                 .build();
@@ -126,7 +122,8 @@ public class UserController {
     }
 
     @PostMapping("/forgot-password/verify-otp")
-    ApiResponse<VerifyForgotPasswordOtpResponse> verifyForgotPasswordOtp(@RequestBody VerifyForgotPasswordOtpRequest request) {
+    ApiResponse<VerifyForgotPasswordOtpResponse> verifyForgotPasswordOtp(
+            @RequestBody VerifyForgotPasswordOtpRequest request) {
         return ApiResponse.<VerifyForgotPasswordOtpResponse>builder()
                 .result(userService.verifyForgotPasswordOtp(request))
                 .build();

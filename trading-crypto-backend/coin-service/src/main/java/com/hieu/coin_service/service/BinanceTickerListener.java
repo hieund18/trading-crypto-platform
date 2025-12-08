@@ -1,5 +1,14 @@
 package com.hieu.coin_service.service;
 
+import java.time.Duration;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hieu.coin_service.entity.Coin;
@@ -18,22 +27,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
-
-import java.time.Duration;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 @Component
 @RequiredArgsConstructor
@@ -77,13 +76,10 @@ public class BinanceTickerListener {
             WebSocketClient client = new StandardWebSocketClient(container);
 
             client.doHandshake(new BinanceHandler(), BINANCE_WS)
-                    .addCallback(
-                            result -> log.info("Conneted to Binance WS: {}", BINANCE_WS),
-                            ex -> {
-                                log.error("Failed to connect to Binance WS, retrying...", ex);
-                                scheduleReconnect();
-                            }
-                    );
+                    .addCallback(result -> log.info("Conneted to Binance WS: {}", BINANCE_WS), ex -> {
+                        log.error("Failed to connect to Binance WS, retrying...", ex);
+                        scheduleReconnect();
+                    });
         } catch (Exception exception) {
             log.error("Failed to connect to Binance WS, retrying...", exception);
             scheduleReconnect();
@@ -101,14 +97,12 @@ public class BinanceTickerListener {
             try {
                 JsonNode root = objectMapper.readTree(message.getPayload());
 
-                if (!root.isArray())
-                    return;
+                if (!root.isArray()) return;
 
                 redisTemplate.executePipelined((RedisCallback<Object>) connection -> {
                     for (JsonNode node : root) {
                         String symbol = node.get("s").asText();
-                        if (!supportedSymbols.contains(symbol))
-                            continue;
+                        if (!supportedSymbols.contains(symbol)) continue;
 
                         byte[] key = RedisKeyUtil.binanceTicker(symbol).getBytes();
 
@@ -120,11 +114,13 @@ public class BinanceTickerListener {
                         double openDouble = Double.parseDouble(open);
                         double pct = (lastDouble - openDouble) / openDouble * 100;
 
-
                         connection.hSet(key, "last".getBytes(), last.getBytes());
                         connection.hSet(key, "open".getBytes(), open.getBytes());
                         connection.hSet(key, "volume".getBytes(), vol.getBytes());
-                        connection.hSet(key, "priceChangePct".getBytes(), String.valueOf(pct).getBytes());
+                        connection.hSet(
+                                key,
+                                "priceChangePct".getBytes(),
+                                String.valueOf(pct).getBytes());
 
                         connection.expire(key, Duration.ofMinutes(5));
 
@@ -132,7 +128,8 @@ public class BinanceTickerListener {
                         connection.zAdd(priceKey, lastDouble, symbol.getBytes());
                         connection.expire(priceKey, Duration.ofMinutes(5));
 
-                        byte[] priceChangeKey = RedisKeyUtil.leaderboard("price-change").getBytes();
+                        byte[] priceChangeKey =
+                                RedisKeyUtil.leaderboard("price-change").getBytes();
                         connection.zAdd(priceChangeKey, pct, symbol.getBytes());
                         connection.expire(priceChangeKey, Duration.ofMinutes(5));
                     }

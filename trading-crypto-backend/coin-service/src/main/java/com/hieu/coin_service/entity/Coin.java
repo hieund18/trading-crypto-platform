@@ -1,5 +1,7 @@
 package com.hieu.coin_service.entity;
 
+import java.time.Instant;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.annotation.CreatedDate;
@@ -7,8 +9,6 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
-
-import java.time.Instant;
 
 @Getter
 @Setter

@@ -12,5 +12,4 @@ public interface UserMapper {
     User toUser(UserCreationRequest userCreationRequest);
 
     UserResponse toUserResponse(User user);
-
 }

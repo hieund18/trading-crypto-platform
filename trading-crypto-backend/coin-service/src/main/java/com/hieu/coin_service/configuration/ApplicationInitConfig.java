@@ -14,7 +14,7 @@ import org.springframework.data.mongodb.config.EnableMongoAuditing;
 public class ApplicationInitConfig {
 
     @Bean
-    public ApplicationRunner applicationRunner(CoinService coinService, MarketChartService marketChartService){
+    public ApplicationRunner applicationRunner(CoinService coinService, MarketChartService marketChartService) {
         log.info("Initializing application...");
         return args -> {
             coinService.initCoins();

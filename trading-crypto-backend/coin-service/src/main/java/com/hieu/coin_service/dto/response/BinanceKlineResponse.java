@@ -1,13 +1,13 @@
-//package com.hieu.coin_service.dto.response;
+// package com.hieu.coin_service.dto.response;
 //
-//import lombok.*;
-//import lombok.experimental.FieldDefaults;
+// import lombok.*;
+// import lombok.experimental.FieldDefaults;
 //
-//@Data
-//@Builder
-//@NoArgsConstructor
-//@AllArgsConstructor
-//@FieldDefaults(level = AccessLevel.PRIVATE)
-//public class BinanceKlineResponse {
+// @Data
+// @Builder
+// @NoArgsConstructor
+// @AllArgsConstructor
+// @FieldDefaults(level = AccessLevel.PRIVATE)
+// public class BinanceKlineResponse {
 //
-//}
+// }

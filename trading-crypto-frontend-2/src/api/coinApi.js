@@ -30,10 +30,27 @@ export async function getCoinDetailApi(id) {
   return res.data;
 }
 
-export async function updateCoinStatusApi(coinId, isActive) {
-  // Giả sử endpoint backend là PATCH /coin/markets/{id}/status
-  const res = await api.patch(`/coin/markets/${coinId}/status`, {
-    isActive: isActive
+export async function updateCoinStatusApi(coinId) {
+  // Endpoint: PATCH /coin/markets/status/{id}
+  const res = await api.patch(`/coin/markets/status/${coinId}`);
+  return res.data;
+}
+
+// 1. Tìm kiếm Binance Symbol [MỚI]
+export async function searchBinanceSymbolsApi(keyword = "") {
+  const params = { page: 1, size: 20 }; // Lấy 20 kết quả gợi ý
+  if (keyword) params.keyword = keyword;
+  
+  // Endpoint: /coin/master/binance-symbol/search
+  const res = await api.get("/coin/master/binance-symbol/search", { params });
+  return res.data;
+}
+
+// 2. Cập nhật Binance Symbol cho Coin [MỚI]
+export async function updateCoinBinanceSymbolApi(coinId, binanceSymbol) {
+  // Endpoint: PUT /coin/markets/binance-symbol/{id}
+  const res = await api.put(`/coin/markets/binance-symbol/${coinId}`, {
+    binanceSymbol
   });
   return res.data;
 }
@@ -55,6 +72,25 @@ export async function convertAmountToQuantityApi(coinId, amount) {
   });
   return res.data;
 }
+
+export async function searchCoinGeckoApi(keyword) {
+  // Endpoint: /coin/master/coingecko/search
+  // Params: keyword, size=50
+  const params = { keyword, size: 50 };
+  const res = await api.get("/coin/master/coingecko/search", { params });
+  return res.data;
+}
+
+// 🔥 2. Thêm coin mới vào hệ thống
+export async function addCoinToMarketApi(coinGeckoId) {
+  // Endpoint: POST /coin/markets
+  // Body: { "id": "bitcoin" }
+  const res = await api.post("/coin/markets", {
+    id: coinGeckoId
+  });
+  return res.data;
+}
+
 
 // ==========================================
 // 🔥 WATCHLIST APIs

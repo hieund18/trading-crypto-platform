@@ -19,8 +19,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -29,23 +27,28 @@ public class CoinController {
     CoinGeckoService coinGeckoService;
     CoinService coinService;
 
-//    @GetMapping("/markets")
-//    ApiResponse<List<CoinGeckoMarketDataResponse>> getCoins(@RequestParam(value = "currency", defaultValue = "usd") String currency,
-//                                                            @RequestParam(value = "page", defaultValue = "1") int page,
-//                                                            @RequestParam(value = "size", defaultValue = "10") int size) {
-//        return ApiResponse.<List<CoinGeckoMarketDataResponse>>builder()
-//                .result(coinGeckoService.getMarketData(currency, page, size))
-//                .build();
-//    }
-//
-//    @GetMapping("/{id}/market-chart")
-//    ApiResponse<CoinGeckoMarketChartResponse> getMarketChart(@PathVariable String id,
-//                                                             @RequestParam(value = "currency", defaultValue = "usd") String currency,
-//                                                             @RequestParam(value = "days", defaultValue = "1") int days) {
-//        return ApiResponse.<CoinGeckoMarketChartResponse>builder()
-//                .result(coinGeckoService.getMarketChart(currency, id, days))
-//                .build();
-//    }
+    //    @GetMapping("/markets")
+    //    ApiResponse<List<CoinGeckoMarketDataResponse>> getCoins(@RequestParam(value = "currency", defaultValue =
+    // "usd") String currency,
+    //                                                            @RequestParam(value = "page", defaultValue = "1") int
+    // page,
+    //                                                            @RequestParam(value = "size", defaultValue = "10") int
+    // size) {
+    //        return ApiResponse.<List<CoinGeckoMarketDataResponse>>builder()
+    //                .result(coinGeckoService.getMarketData(currency, page, size))
+    //                .build();
+    //    }
+    //
+    //    @GetMapping("/{id}/market-chart")
+    //    ApiResponse<CoinGeckoMarketChartResponse> getMarketChart(@PathVariable String id,
+    //                                                             @RequestParam(value = "currency", defaultValue =
+    // "usd") String currency,
+    //                                                             @RequestParam(value = "days", defaultValue = "1") int
+    // days) {
+    //        return ApiResponse.<CoinGeckoMarketChartResponse>builder()
+    //                .result(coinGeckoService.getMarketChart(currency, id, days))
+    //                .build();
+    //    }
 
     @PostMapping("/markets")
     ApiResponse<CoinResponse> addCoin(@RequestBody AddCoinRequest request) {
@@ -56,8 +59,7 @@ public class CoinController {
 
     @GetMapping("/markets")
     ApiResponse<PageResponse<CoinResponse>> getAllCoins(
-            @PageableDefault(page = 1, sort = "marketCapRank", direction = Sort.Direction.ASC) Pageable pageable
-    ) {
+            @PageableDefault(page = 1, sort = "marketCapRank", direction = Sort.Direction.ASC) Pageable pageable) {
         return ApiResponse.<PageResponse<CoinResponse>>builder()
                 .result(coinService.getAllCoins(pageable))
                 .build();
@@ -65,8 +67,7 @@ public class CoinController {
 
     @GetMapping("/markets/trending")
     ApiResponse<PageResponse<CoinResponse>> getTrendingCoin(
-            @PageableDefault(page = 1, sort = "trendingRank", direction = Sort.Direction.ASC) Pageable pageable
-    ) {
+            @PageableDefault(page = 1, sort = "trendingRank", direction = Sort.Direction.ASC) Pageable pageable) {
         return ApiResponse.<PageResponse<CoinResponse>>builder()
                 .result(coinService.getTrendingCoins(pageable))
                 .build();
@@ -83,8 +84,7 @@ public class CoinController {
     ApiResponse<PageResponse<CoinResponse>> searchCoins(
             @RequestParam(required = false, defaultValue = "") String keyword,
             @RequestParam(required = false) Boolean isActive,
-            @PageableDefault(page = 1, sort = "marketCapRank", direction = Sort.Direction.ASC) Pageable pageable
-    ) {
+            @PageableDefault(page = 1, sort = "marketCapRank", direction = Sort.Direction.ASC) Pageable pageable) {
         return ApiResponse.<PageResponse<CoinResponse>>builder()
                 .result(coinService.searchCoins(pageable, isActive, keyword))
                 .build();
@@ -98,7 +98,8 @@ public class CoinController {
     }
 
     @PutMapping("/markets/binance-symbol/{id}")
-    ApiResponse<CoinResponse> updateBinanceSymbol(@PathVariable String id, @RequestBody UpdateBinanceSymbolRequest request) {
+    ApiResponse<CoinResponse> updateBinanceSymbol(
+            @PathVariable String id, @RequestBody UpdateBinanceSymbolRequest request) {
         return ApiResponse.<CoinResponse>builder()
                 .result(coinService.updateBinanceSymbol(id, request))
                 .build();
@@ -121,8 +122,7 @@ public class CoinController {
     @GetMapping("/master/coingecko/search")
     ApiResponse<PageResponse<CoinGeckoMaster>> searchCoinGeckoMaster(
             @RequestParam(required = false, defaultValue = "") String keyword,
-            @PageableDefault(page = 1, sort = "name", direction = Sort.Direction.ASC) Pageable pageable
-    ) {
+            @PageableDefault(page = 1, sort = "name", direction = Sort.Direction.ASC) Pageable pageable) {
         return ApiResponse.<PageResponse<CoinGeckoMaster>>builder()
                 .result(coinService.searchCoinGeckoMaster(pageable, keyword))
                 .build();
@@ -131,8 +131,7 @@ public class CoinController {
     @GetMapping("/master/binance-symbol/search")
     ApiResponse<PageResponse<BinanceSymbolMaster>> searchBinanceSymbolMaster(
             @RequestParam(required = false, defaultValue = "") String keyword,
-            @PageableDefault(page = 1, sort = "symbol", direction = Sort.Direction.ASC) Pageable pageable
-    ) {
+            @PageableDefault(page = 1, sort = "symbol", direction = Sort.Direction.ASC) Pageable pageable) {
         return ApiResponse.<PageResponse<BinanceSymbolMaster>>builder()
                 .result(coinService.searchBinanceSymbolMaster(pageable, keyword))
                 .build();

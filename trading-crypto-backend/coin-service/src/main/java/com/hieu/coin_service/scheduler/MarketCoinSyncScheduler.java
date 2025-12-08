@@ -15,8 +15,8 @@ import org.springframework.stereotype.Component;
 public class MarketCoinSyncScheduler {
     CoinService coinService;
 
-    //@Scheduled(fixedRate = 1000 * 60 * 60 * 12)
-    public void syncAllMaster(){
+    // @Scheduled(fixedRate = 1000 * 60 * 60 * 12)
+    public void syncAllMaster() {
         log.info("Start master sync...");
 
         coinService.syncCoinGeckoMaster();
@@ -26,7 +26,7 @@ public class MarketCoinSyncScheduler {
     }
 
     @Scheduled(fixedRate = 1000 * 60 * 15)
-    public void syncMarketCoin(){
+    public void syncMarketCoin() {
         log.info("Start sync market...");
 
         coinService.syncCoinData();

@@ -1,7 +1,5 @@
 
-y
-java:S1488#"\Immediately return this expression instead of assigning it to the temporary variable "list".(×˜ìé8å¼ï¥3
-y
-java:S1488,"\Immediately return this expression instead of assigning it to the temporary variable "list".(µèˆƒ8å¼ï¥3
 >
-java:S1116<"Remove this empty statement.(Åñ­õşÿÿÿÿ8Ñå¼ï¥3
+java:S1116-"Remove this empty statement.(Åñ­õşÿÿÿÿ8Ñå¼ï¥3
+i
+java:S1128"GRemove this unused import 'ch.qos.logback.classic.spi.IThrowableProxy'.(Ã”îúÿÿÿÿ8“·Âˆ®3

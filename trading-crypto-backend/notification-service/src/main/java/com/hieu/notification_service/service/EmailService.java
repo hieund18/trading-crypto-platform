@@ -1,5 +1,7 @@
 package com.hieu.notification_service.service;
 
+import java.util.List;
+
 import com.hieu.notification_service.dto.request.*;
 import com.hieu.notification_service.exception.AppException;
 import com.hieu.notification_service.exception.ErrorCode;
@@ -13,8 +15,6 @@ import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -37,19 +37,13 @@ public class EmailService {
 
     @Retry(name = "emailService")
     public void sendEmail(SendEmailRequest request) {
-        Personalization personalization = Personalization.builder()
-                .to(List.of(request.getTo()))
-                .build();
+        Personalization personalization =
+                Personalization.builder().to(List.of(request.getTo())).build();
 
-        Sender sender = Sender.builder()
-                .email(senderEmail)
-                .name(senderName)
-                .build();
+        Sender sender = Sender.builder().email(senderEmail).name(senderName).build();
 
-        Content content = Content.builder()
-                .type("text/html")
-                .value(request.getValue())
-                .build();
+        Content content =
+                Content.builder().type("text/html").value(request.getValue()).build();
 
         EmailRequest emailRequest = EmailRequest.builder()
                 .personalizations(List.of(personalization))

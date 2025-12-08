@@ -1,5 +1,10 @@
 package com.hieu.coin_service.service;
 
+import java.time.Instant;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hieu.coin_service.dto.CoinUpdateEvent;
 import com.hieu.coin_service.dto.PageResponse;
@@ -44,11 +49,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
-import java.time.Instant;
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -69,14 +69,15 @@ public class CoinService {
 
     BinanceTickerListener binanceTickerListener;
 
+    MarketChartService marketChartService;
+
     @NonFinal
     List<String> activeSymbols = new ArrayList<>();
 
     public CoinResponse addCoin(AddCoinRequest request) {
 
         var coinGeckoMarketDataResponses = coinGeckoService.getCoinData("usd", request.getId());
-        if (CollectionUtils.isEmpty(coinGeckoMarketDataResponses))
-            throw new AppException(ErrorCode.INVALID_COIN);
+        if (CollectionUtils.isEmpty(coinGeckoMarketDataResponses)) throw new AppException(ErrorCode.INVALID_COIN);
 
         Coin coin = coinMapper.toCoin(coinGeckoMarketDataResponses.get(0));
         coin.setCreatedAt(Instant.now());
@@ -105,6 +106,9 @@ public class CoinService {
 
         kafkaTemplate.send("coin-update", coinUpdateEvent);
 
+        if (StringUtils.hasText(coin.getBinanceSymbol()))
+            marketChartService.initMarketChartBySymbol(coin.getBinanceSymbol());
+
         var coinResponse = coinMapper.toCoinResponse(coin);
 
         return coinResponse;
@@ -114,10 +118,13 @@ public class CoinService {
         Pageable pageRequest = PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize(), pageable.getSort());
         var pageData = coinRepository.findAll(pageRequest);
 
-        var response = pageData.getContent().stream().map(coinMapper::toCoinResponse).toList();
+        var response =
+                pageData.getContent().stream().map(coinMapper::toCoinResponse).toList();
 
-        List<String> binanceSymbols = response.stream().map(CoinResponse::getBinanceSymbol)
-                .filter(Objects::nonNull).toList();
+        List<String> binanceSymbols = response.stream()
+                .map(CoinResponse::getBinanceSymbol)
+                .filter(Objects::nonNull)
+                .toList();
 
         Map<String, TickerResponse> tickerMap = getTickersFromRedis(binanceSymbols);
 
@@ -141,10 +148,13 @@ public class CoinService {
         Pageable pageRequest = PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize(), pageable.getSort());
         var pageData = coinRepository.findByTrendingRankNotNullAndIsActiveTrue(pageRequest);
 
-        var response = pageData.getContent().stream().map(coinMapper::toCoinResponse).toList();
+        var response =
+                pageData.getContent().stream().map(coinMapper::toCoinResponse).toList();
 
-        List<String> binanceSymbols = response.stream().map(CoinResponse::getBinanceSymbol)
-                .filter(Objects::nonNull).toList();
+        List<String> binanceSymbols = response.stream()
+                .map(CoinResponse::getBinanceSymbol)
+                .filter(Objects::nonNull)
+                .toList();
 
         Map<String, TickerResponse> tickerMap = getTickersFromRedis(binanceSymbols);
 
@@ -165,18 +175,15 @@ public class CoinService {
     }
 
     public CoinResponse getCoin(String id) {
-        Coin coin = coinRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.COIN_NOT_EXISTED));
+        Coin coin = coinRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.COIN_NOT_EXISTED));
 
         var coinResponse = coinMapper.toCoinResponse(coin);
 
         String binanceSymbol = coin.getBinanceSymbol();
-        if (binanceSymbol == null)
-            return coinResponse;
+        if (binanceSymbol == null) return coinResponse;
 
         TickerResponse tickerResponse = getTicketFromRedis(binanceSymbol);
-        if (tickerResponse != null)
-            coinMapper.updateCoinResponse(coinResponse, tickerResponse);
+        if (tickerResponse != null) coinMapper.updateCoinResponse(coinResponse, tickerResponse);
 
         return coinResponse;
     }
@@ -193,15 +200,17 @@ public class CoinService {
         if (isRealtimeSort && !StringUtils.hasText(keyword)) {
             String keyType = "currentPrice".equals(sortProperty) ? "price" : "price-change";
             var response = getCoinsFromLeaderboard(pageRequest, keyType, sortProperty);
-            if (response != null)
-                return response;
+            if (response != null) return response;
         }
 
         Page<Coin> coinPage = coinRepository.search(keyword, isActive, pageRequest);
 
-        var response = coinPage.getContent().stream().map(coinMapper::toCoinResponse).toList();
-        List<String> binanceSymbols = response.stream().map(CoinResponse::getBinanceSymbol)
-                .filter(Objects::nonNull).toList();
+        var response =
+                coinPage.getContent().stream().map(coinMapper::toCoinResponse).toList();
+        List<String> binanceSymbols = response.stream()
+                .map(CoinResponse::getBinanceSymbol)
+                .filter(Objects::nonNull)
+                .toList();
         Map<String, TickerResponse> tickerMap = getTickersFromRedis(binanceSymbols);
 
         response.forEach(coinResponse -> {
@@ -222,8 +231,7 @@ public class CoinService {
 
     @PreAuthorize("hasRole('ADMIN')")
     public CoinResponse updateCoinStatus(String id) {
-        Coin coin = coinRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.COIN_NOT_EXISTED));
+        Coin coin = coinRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.COIN_NOT_EXISTED));
 
         coin.setIsActive(!coin.getIsActive());
         coinRepository.save(coin);
@@ -235,12 +243,15 @@ public class CoinService {
 
         kafkaTemplate.send("coin-update", coinUpdateEvent);
 
+        if (StringUtils.hasText(coin.getBinanceSymbol()) && Boolean.TRUE.equals(coin.getIsActive()))
+            marketChartService.initMarketChartBySymbol(coin.getBinanceSymbol());
+
         return coinMapper.toCoinResponse(coin);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public CoinResponse updateBinanceSymbol(String id, UpdateBinanceSymbolRequest request) {
-        Coin coin = coinRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.COIN_NOT_EXISTED));
+        Coin coin = coinRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.COIN_NOT_EXISTED));
 
         String binanceSymbol = request.getBinanceSymbol();
 
@@ -249,9 +260,9 @@ public class CoinService {
 
         coin.setBinanceSymbol(binanceSymbol);
 
-        try{
+        try {
             coinRepository.save(coin);
-        }catch (DuplicateKeyException exception){
+        } catch (DuplicateKeyException exception) {
             throw new AppException(ErrorCode.BINANCE_SYMBOL_EXISTED);
         }
 
@@ -262,24 +273,27 @@ public class CoinService {
 
         kafkaTemplate.send("coin-update", coinUpdateEvent);
 
+        if (StringUtils.hasText(coin.getBinanceSymbol()))
+            marketChartService.initMarketChartBySymbol(coin.getBinanceSymbol());
+
         return coinMapper.toCoinResponse(coin);
     }
 
     public ConvertResponse convertAmountToQuantity(ConvertAmountRequest request) {
-        Coin coin = coinRepository.findById(request.getCoinId())
+        Coin coin = coinRepository
+                .findById(request.getCoinId())
                 .orElseThrow(() -> new AppException(ErrorCode.COIN_NOT_EXISTED));
 
         Double currentPrice = coin.getCurrentPrice();
 
-        if(StringUtils.hasText(coin.getBinanceSymbol())){
+        if (StringUtils.hasText(coin.getBinanceSymbol())) {
             TickerResponse tickerResponse = getTicketFromRedis(coin.getBinanceSymbol());
 
-            if(tickerResponse != null && tickerResponse.getCurrentPrice() != null)
+            if (tickerResponse != null && tickerResponse.getCurrentPrice() != null)
                 currentPrice = tickerResponse.getCurrentPrice();
         }
 
-        if(currentPrice == null || currentPrice == 0)
-            throw new AppException(ErrorCode.INVALID_PRICE);
+        if (currentPrice == null || currentPrice == 0) throw new AppException(ErrorCode.INVALID_PRICE);
 
         ConvertResponse convertResponse = coinMapper.toConvertResponse(request);
         convertResponse.setPrice(currentPrice);
@@ -289,20 +303,20 @@ public class CoinService {
     }
 
     public ConvertResponse convertQuantityToAmount(ConvertQuantityRequest request) {
-        Coin coin = coinRepository.findById(request.getCoinId())
+        Coin coin = coinRepository
+                .findById(request.getCoinId())
                 .orElseThrow(() -> new AppException(ErrorCode.COIN_NOT_EXISTED));
 
         Double currentPrice = coin.getCurrentPrice();
 
-        if(StringUtils.hasText(coin.getBinanceSymbol())){
+        if (StringUtils.hasText(coin.getBinanceSymbol())) {
             TickerResponse tickerResponse = getTicketFromRedis(coin.getBinanceSymbol());
 
-            if(tickerResponse != null && tickerResponse.getCurrentPrice() != null)
+            if (tickerResponse != null && tickerResponse.getCurrentPrice() != null)
                 currentPrice = tickerResponse.getCurrentPrice();
         }
 
-        if(currentPrice == null || currentPrice == 0)
-            throw new AppException(ErrorCode.INVALID_PRICE);
+        if (currentPrice == null || currentPrice == 0) throw new AppException(ErrorCode.INVALID_PRICE);
 
         ConvertResponse convertResponse = coinMapper.toConvertResponse(request);
         convertResponse.setPrice(currentPrice);
@@ -311,14 +325,17 @@ public class CoinService {
         return convertResponse;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public PageResponse<CoinGeckoMaster> searchCoinGeckoMaster(Pageable pageable, String keyword) {
         Pageable pageRequest = PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize(), pageable.getSort());
 
-        var pageData = coinGeckoMasterRepository.findAllByNameContainingIgnoreCaseOrSymbolContainingIgnoreCase(keyword, keyword, pageRequest);
+        var pageData = coinGeckoMasterRepository.findAllByNameContainingIgnoreCaseOrSymbolContainingIgnoreCase(
+                keyword, keyword, pageRequest);
 
         return PageResponse.fromPage(pageData);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public PageResponse<BinanceSymbolMaster> searchBinanceSymbolMaster(Pageable pageable, String keyword) {
         Pageable pageRequest = PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize(), pageable.getSort());
 
@@ -330,13 +347,14 @@ public class CoinService {
     @Scheduled(fixedRate = 1000 * 60)
     public void refreshSupportedSymbols() {
         activeSymbols = coinRepository.findByIsActiveTrue().stream()
-                .map(Coin::getBinanceSymbol).filter(Objects::nonNull).toList();
+                .map(Coin::getBinanceSymbol)
+                .filter(Objects::nonNull)
+                .toList();
     }
 
     @Scheduled(fixedRate = 1000)
     public void broadcastTicker() {
-        if (activeSymbols.isEmpty())
-            return;
+        if (activeSymbols.isEmpty()) return;
 
         Map<String, TickerResponse> tickerMap = getTickersFromRedis(activeSymbols);
 
@@ -350,8 +368,7 @@ public class CoinService {
             }
         }
 
-        if (!lisToSend.isEmpty())
-            messagingTemplate.convertAndSend("/topic/tickers", lisToSend);
+        if (!lisToSend.isEmpty()) messagingTemplate.convertAndSend("/topic/tickers", lisToSend);
     }
 
     public void syncCoinGeckoMaster() {
@@ -363,7 +380,8 @@ public class CoinService {
             }
 
             coinGeckoMasterRepository.deleteAll();
-            var listCoins = responseList.stream().map(coinMapper::toCoinGeckoMaster).toList();
+            var listCoins =
+                    responseList.stream().map(coinMapper::toCoinGeckoMaster).toList();
             coinGeckoMasterRepository.saveAll(listCoins);
             log.info("Sync {} records", listCoins.size());
         } catch (FeignException exception) {
@@ -380,9 +398,10 @@ public class CoinService {
             }
 
             binanceSymbolMasterRepository.deleteAll();
-            var listBinanceSymbolMaster = binanceExchangeInfoResponse.getSymbols()
-                    .stream().filter(binanceSymbol -> "TRADING".equalsIgnoreCase(binanceSymbol.getStatus()))
-                    .map(coinMapper::toBinanceSymbolMaster).toList();
+            var listBinanceSymbolMaster = binanceExchangeInfoResponse.getSymbols().stream()
+                    .filter(binanceSymbol -> "TRADING".equalsIgnoreCase(binanceSymbol.getStatus()))
+                    .map(coinMapper::toBinanceSymbolMaster)
+                    .toList();
             binanceSymbolMasterRepository.saveAll(listBinanceSymbolMaster);
             log.info("Sync {} records", listBinanceSymbolMaster.size());
         } catch (FeignException exception) {
@@ -393,8 +412,7 @@ public class CoinService {
     public void syncTrendingCoin() {
         try {
             var trendingResponse = coinGeckoService.getTrendingCoin();
-            if (ObjectUtils.isEmpty(trendingResponse))
-                return;
+            if (ObjectUtils.isEmpty(trendingResponse)) return;
 
             List<String> trendingIds = trendingResponse.getCoins().stream()
                     .map(trendingCoin -> trendingCoin.getItem().getId())
@@ -431,8 +449,7 @@ public class CoinService {
 
             try {
                 List<CoinGeckoMarketDataResponse> listCoinResponse = coinGeckoService.getCoinData("usd", ids);
-                if (CollectionUtils.isEmpty(listCoinResponse))
-                    continue;
+                if (CollectionUtils.isEmpty(listCoinResponse)) continue;
 
                 Map<String, CoinGeckoMarketDataResponse> mapResponse = listCoinResponse.stream()
                         .collect(Collectors.toMap(CoinGeckoMarketDataResponse::getId, Function.identity()));
@@ -447,8 +464,7 @@ public class CoinService {
                     }
                 }
 
-                if (!coinsToUpdate.isEmpty())
-                    coinRepository.saveAll(coinsToUpdate);
+                if (!coinsToUpdate.isEmpty()) coinRepository.saveAll(coinsToUpdate);
 
                 Thread.sleep(1000);
             } catch (Exception exception) {
@@ -521,15 +537,14 @@ public class CoinService {
             symbolsObj = Collections.emptySet();
         }
 
-        if (CollectionUtils.isEmpty(symbolsObj))
-            return null;
+        if (CollectionUtils.isEmpty(symbolsObj)) return null;
 
         List<String> symbols = symbolsObj.stream().map(Object::toString).toList();
 
         List<Coin> coins = coinRepository.findByBinanceSymbolInAndIsActiveTrue(symbols);
 
-        Map<String, Coin> coinMap = coins.stream()
-                .collect(Collectors.toMap(Coin::getBinanceSymbol, Function.identity(), (a, b) -> a));
+        Map<String, Coin> coinMap =
+                coins.stream().collect(Collectors.toMap(Coin::getBinanceSymbol, Function.identity(), (a, b) -> a));
 
         List<CoinResponse> response = new ArrayList<>();
         for (String symbol : symbols) {
@@ -539,8 +554,10 @@ public class CoinService {
             }
         }
 
-        List<String> binanceSymbols = response.stream().map(CoinResponse::getBinanceSymbol)
-                .filter(Objects::nonNull).toList();
+        List<String> binanceSymbols = response.stream()
+                .map(CoinResponse::getBinanceSymbol)
+                .filter(Objects::nonNull)
+                .toList();
         Map<String, TickerResponse> tickerMap = getTickersFromRedis(binanceSymbols);
 
         response.forEach(coinResponse -> {
@@ -583,8 +600,7 @@ public class CoinService {
     }
 
     private TickerResponse getTicketFromRedis(String binanceSymbol) {
-        if (!StringUtils.hasText(binanceSymbol))
-            return null;
+        if (!StringUtils.hasText(binanceSymbol)) return null;
 
         String key = RedisKeyUtil.binanceTicker(binanceSymbol);
         Map<Object, Object> map = redisTemplate.opsForHash().entries(key);
@@ -595,8 +611,7 @@ public class CoinService {
     }
 
     private Map<String, TickerResponse> getTickersFromRedis(List<String> binanceSymbols) {
-        if (CollectionUtils.isEmpty(binanceSymbols))
-            return Collections.emptyMap();
+        if (CollectionUtils.isEmpty(binanceSymbols)) return Collections.emptyMap();
 
         List<Object> results = redisTemplate.executePipelined(new SessionCallback<Object>() {
             @Override

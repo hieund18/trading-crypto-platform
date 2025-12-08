@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class FeignConfiguration {
     @Bean
-    public Encoder multipartFormEncoder(){
+    public Encoder multipartFormEncoder() {
         return new SpringFormEncoder();
     }
 }

@@ -7,7 +7,6 @@ import com.hieu.coin_service.entity.BinanceSymbolMaster;
 import com.hieu.coin_service.entity.Coin;
 import com.hieu.coin_service.entity.CoinGeckoMaster;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
@@ -19,7 +18,8 @@ public interface CoinMapper {
 
     void updateCoin(@MappingTarget Coin coin, CoinGeckoMarketDataResponse coinGeckoMarketDataResponse);
 
-    void updateCoinResponse(@MappingTarget CoinResponse coinResponse, CoinGeckoMarketDataResponse coinGeckoMarketDataResponse);
+    void updateCoinResponse(
+            @MappingTarget CoinResponse coinResponse, CoinGeckoMarketDataResponse coinGeckoMarketDataResponse);
 
     CoinUpdateResponse toCoinUpdateResponse(Coin coin);
 

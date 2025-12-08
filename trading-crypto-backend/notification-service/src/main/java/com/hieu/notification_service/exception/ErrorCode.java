@@ -16,7 +16,6 @@ public enum ErrorCode {
 
     CANNOT_SEND_EMAIL(2001, "Cannot send email", HttpStatus.INTERNAL_SERVER_ERROR),
     INVALID_CHANNEL(2101, "Invalid channel", HttpStatus.INTERNAL_SERVER_ERROR),
-
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
