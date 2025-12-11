@@ -7,15 +7,15 @@ spring:
     name: coin-service
   data:
     mongodb:
-      uri: ${DBMS_CONNECTION:mongodb://root:root@localhost:27017/coin_service?authSource=admin}
+      uri: ${MONGO_URI:mongodb://root:root@mongodb:27017/coin_service?authSource=admin}
       auto-index-creation: true
   redis:
-    host: redis
-    port: 6379
+    host: ${REDIS_HOST:redis}
+    port: ${REDIS_PORT:6379}
 #    password:
     database: 0
   kafka:
-    bootstrap-servers: localhost:9094
+    bootstrap-servers: ${KAFKA_BOOTSTRAP:kafka:9092}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer

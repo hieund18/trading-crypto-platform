@@ -719,3 +719,19 @@ Vcoin-service/src/main/java/com/hieu/coin_service/repository/MarketChartReposito
 Vcoin-service/src/main/java/com/hieu/coin_service/controller/MarketChartController.java,1\7\17ff0fbebeb3b4e19cd8b25179bad6f1db609e33
 „
 Torder-service/src/main/java/com/hieu/order_service/dto/request/AssetSellRequest.java,9\8\98167e8cefbe88374be0276ea5ba7de4cccb73ad
+K
+identity-service/Dockerfile,8\6\86979b377932d387f346cca84334d89e3f934cf2
+G
+coin-service/Dockerfile,f\4\f46bb87444004b8b0e72e61b12e4cba7376a2a0e
+G
+file-service/Dockerfile,0\6\06952d9fafd901971effad7093f2b7800c0edea2
+O
+notification-service/Dockerfile,a\5\a5693f114eb0276b04eefb1f68707f0ed42da66c
+H
+order-service/Dockerfile,6\c\6ca8c7ba98a55aa5204b50509916e7ece908a304
+F
+otp-service/Dockerfile,d\1\d11e0ba577e54402ad8c88cee9b8ab878dc7115f
+J
+profile-service/Dockerfile,8\6\86c047a89d4427da3dbfa8b3e6e61552def57a42
+I
+wallet-service/Dockerfile,e\2\e2ad0e2af1cd2f174e501b54cbce690de4949286

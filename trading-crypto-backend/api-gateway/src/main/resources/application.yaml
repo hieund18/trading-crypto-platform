@@ -4,9 +4,9 @@ server:
 app:
   api-prefix: /api/v1
   services:
-    identity: http://localhost:8080/identity
+    identity: http://identity-service:8080/identity
   frontend:
-    url: http://localhost:5173
+    url: ${FRONTEND_URL:http://localhost:5173}
 
 spring:
   application:
@@ -15,44 +15,44 @@ spring:
     gateway:
       routes:
       - id: identity_service
-        uri: http://localhost:8080
+        uri: http://identity-service:8080
         predicates:
         - Path=${app.api-prefix}/identity/**
         filters:
         - StripPrefix=2
       - id: profile_service
-        uri: http://localhost:8083
+        uri: http://profile-service:8083
         predicates:
         - Path=${app.api-prefix}/profile/users/**
         filters:
         - StripPrefix=2
       - id: file_service
-        uri: http://localhost:8084
+        uri: http://file-service:8084
         predicates:
         - Path=${app.api-prefix}/file/**
         filters:
         - StripPrefix=2
       - id: coin_service
-        uri: http://localhost:8085
+        uri: http://coin-service:8085
         predicates:
         - Path=${app.api-prefix}/coin/**
         filters:
         - StripPrefix=2
         - DedupeResponseHeader=Access-Control-Allow-Origin
       - id: coin_service_websocket
-        uri: ws://localhost:8085
+        uri: ws://coin-service:8085
         predicates:
         - Path=${app.api-prefix}/coin/ws/**
         filters:
         - StripPrefix=2
       - id: wallet_service
-        uri: http://localhost:8086
+        uri: http://wallet-service:8086
         predicates:
         - Path=${app.api-prefix}/wallet/wallets/**
         filters:
         - StripPrefix=2
       - id: order_service
-        uri: http://localhost:8087
+        uri: http://order-service:8087
         predicates:
         - Path=${app.api-prefix}/order/**
         filters:

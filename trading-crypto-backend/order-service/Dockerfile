@@ -21,6 +21,6 @@ WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 
 # expose để dễ quản lý (không bắt buộc)
-EXPOSE 8084
+EXPOSE 8087
 
 ENTRYPOINT ["java", "-jar", "app.jar"]

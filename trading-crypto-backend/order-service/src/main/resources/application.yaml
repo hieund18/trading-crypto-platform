@@ -7,7 +7,7 @@ spring:
   application:
     name: order-service
   datasource:
-    url: ${DBMS_CONNECTION:jdbc:mysql://localhost:3306/order_service}
+    url: ${DBMS_CONNECTION:jdbc:mysql://mysql:3306/order_service}
     username: ${DBMS_USERNAME:root}
     password: ${DBMS_PASSWORD:root}
     driver-class-name: "com.mysql.cj.jdbc.Driver"
@@ -18,5 +18,5 @@ spring:
 
 app:
   services:
-    coin: http://localhost:8085/coin
-    wallet: http://localhost:8086/wallet
+    coin: ${COIN_SERVICE_URL:http://coin-service:8085/coin}
+    wallet: ${WALLET_SERVICE_URL:http://wallet-service:8086/wallet}

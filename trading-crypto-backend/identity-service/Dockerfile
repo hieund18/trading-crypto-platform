@@ -4,11 +4,12 @@
 FROM maven:3.9.8-amazoncorretto-21 AS build
 
 WORKDIR /app
-COPY pom.xml .
-RUN mvn dependency:resolve -DskipTests
-COPY src ./src
 
-RUN mvn clean package -DskipTests
+# Copy toàn bộ source code vào Docker
+COPY . .
+
+# Build module identity-service + tự build common trước (-am)
+RUN mvn -pl identity-service -am clean package -DskipTests
 
 
 # ============================
@@ -18,9 +19,10 @@ FROM amazoncorretto:21-alpine
 
 WORKDIR /app
 
-COPY --from=build /app/target/*.jar app.jar
+# COPY đúng đường dẫn JAR vào runtime
+COPY --from=build /app/identity-service/target/*.jar app.jar
 
 # expose để dễ quản lý (không bắt buộc)
-EXPOSE 8084
+EXPOSE 8080
 
 ENTRYPOINT ["java", "-jar", "app.jar"]

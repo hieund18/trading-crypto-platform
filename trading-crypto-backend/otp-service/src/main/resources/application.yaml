@@ -7,10 +7,10 @@ spring:
     name: otp-service
   data:
     mongodb:
-      uri: mongodb://root:root@localhost:27017/otp_service?authSource=admin
+      uri: ${MONGO_URI:mongodb://root:root@mongodb:27017/otp_service?authSource=admin}
       auto-index-creation: true
   kafka:
-    bootstrap-servers: localhost:9094
+    bootstrap-servers: ${KAFKA_BOOTSTRAP:kafka:9092}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer

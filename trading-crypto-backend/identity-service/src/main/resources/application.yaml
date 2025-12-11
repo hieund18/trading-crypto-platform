@@ -6,7 +6,7 @@ spring:
   application:
     name: identity-service
   datasource:
-    url: ${DBMS_CONNECTION:jdbc:mysql://localhost:3306/identity_service1}
+    url: ${DBMS_CONNECTION:jdbc:mysql://mysql:3306/identity_service}
     username: ${DBMS_USERNAME:root}
     password: ${DBMS_PASSWORD:root}
     driver-class-name: "com.mysql.cj.jdbc.Driver"
@@ -17,21 +17,21 @@ spring:
 
 jwt:
   signer-key: ${JWT_SIGNERKEY:/6zEjpNXnIJ1lAaprHIr/W6f+PAzLq+1etCA0+4Qt0vBb8bvj7PR0L27F/wT5WYj}
-  validation-duration: 36000 # in seconds
+  validation-duration: 3600 # in seconds
   refreshable-duration: 36000 # in seconds
   reset-duration: 300 # in seconds
 
 app:
   services:
-    otp: http://localhost:8081/otp
-    profile: http://localhost:8083/profile
-    wallet: http://localhost:8086/wallet
+    otp: ${OTP_SERVICE_URL:http://otp-service:8081/otp}
+    profile: ${PROFILE_SERVICE_URL:http://profile-service:8083/profile}
+    wallet: ${WALLET_SERVICE_URL:http://wallet-service:8086/wallet}
   scheduler:
     delete-unverified-users-cron: "0 0 3 * * *"
 
 outbound:
   identity:
-    redirect-uri: http://localhost:5173/authenticate
+    redirect-uri: ${IDENTITY_REDIRECT_URI:http://localhost:5173/authenticate}
     google:
       token-uri: https://oauth2.googleapis.com
       client-id: 549019372068-en5oa83g6eue0jn2roq97nn80kpsua2k.apps.googleusercontent.com

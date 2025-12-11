@@ -1,0 +1,21 @@
+coin-service:
+  image: hieund18/coin-service:latest
+  environment:
+    MONGO_URI: mongodb://root:root@mongodb:27017/coin_service?authSource=admin
+    REDIS_HOST: redis
+    REDIS_PORT: 6379
+    KAFKA_BOOTSTRAP: kafka:9092
+    COINGECKO_API_KEY: xxxxxxxxx
+  depends_on:
+    - mongodb
+    - redis
+    - kafka
+
+file-service:
+  environment:
+  MONGO_URI: mongodb://root:root@mongodb:27017/file_service?authSource=admin
+  DOWNLOAD_PREFIX: https://api.bitstorm.store/api/v1/file/media/download/
+  AWS_ACCESS_KEY: xxx
+  AWS_SECRET_KEY: xxx
+  AWS_REGION: ap-southeast-1
+  AWS_S3_BUCKET: trading.crypto.app

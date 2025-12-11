@@ -7,7 +7,7 @@ spring:
   application:
     name: wallet-service
   datasource:
-    url: ${DBMS_CONNECTION:jdbc:mysql://localhost:3306/wallet_service}
+    url: ${DBMS_CONNECTION:jdbc:mysql://mysql:3306/wallet_service}
     username: ${DBMS_USERNAME:root}
     password: ${DBMS_PASSWORD:root}
     driver-class-name: "com.mysql.cj.jdbc.Driver"
@@ -18,5 +18,5 @@ spring:
 
 app:
   services:
-    otp: http://localhost:8081/otp
-    identity: http://localhost:8080/identity
+    otp: ${OTP_SERVICE_URL:http://otp-service:8081/otp}
+    identity: ${IDENTITY_SERVICE_URL:http://identity-service:8080/identity}

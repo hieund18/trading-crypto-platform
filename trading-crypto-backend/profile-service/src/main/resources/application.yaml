@@ -7,7 +7,7 @@ spring:
     name: profile-service
   data:
     mongodb:
-      uri: mongodb://root:root@localhost:27017/profile_service?authSource=admin
+      uri: ${MONGO_URI:mongodb://root:root@mongodb:27017/profile_service?authSource=admin}
   servlet:
     multipart:
       max-file-size: 5MB
@@ -15,7 +15,7 @@ spring:
 
 app:
   services:
-    file: http://localhost:8084/file
+    file: ${FILE_SERVICE_URL:http://file-service:8084/file}
   default-avatar:
     url: ${DEFAULT_AVATAR_URL:https://s3.ap-southeast-1.amazonaws.com/trading.crypto.app/system/default-avatar.jpg}
     key: ${DEFAULT_AVATAR_KEY:system/default-avatar.jpg}

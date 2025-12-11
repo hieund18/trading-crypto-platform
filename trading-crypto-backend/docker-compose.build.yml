@@ -3,45 +3,46 @@ version: "3.8"
 services:
   identity-service:
     build:
-      context: ./identity-service
-    image: hieund18/identity-service:0.0.1
+      context: .
+      dockerfile: identity-service/Dockerfile
+    image: hieund18/identity-service:0.0.2
 
   wallet-service:
     build:
       context: ./wallet-service
-    image: hieund18/wallet-service:0.0.1
+    image: hieund18/wallet-service:0.0.2
 
   order-service:
     build:
       context: ./order-service
-    image: hieund18/order-service:0.0.1
+    image: hieund18/order-service:0.0.2
 
   coin-service:
     build:
       context: ./coin-service
-    image: hieund18/coin-service:0.0.1
+    image: hieund18/coin-service:0.0.2
 
   otp-service:
     build:
       context: ./otp-service
-    image: hieund18/otp-service:0.0.1
+    image: hieund18/otp-service:0.0.2
 
   profile-service:
     build:
       context: ./profile-service
-    image: hieund18/profile-service:0.0.1
+    image: hieund18/profile-service:0.0.2
 
   file-service:
     build:
       context: ./file-service
-    image: hieund18/file-service:0.0.1
+    image: hieund18/file-service:0.0.2
 
   api-gateway:
     build:
       context: ./api-gateway
-    image: hieund18/api-gateway:0.0.1
+    image: hieund18/api-gateway:0.0.2
     
   notification-service:
     build:
       context: ./notification-service
-    image: hieund18/notification-service:0.0.1
+    image: hieund18/notification-service:0.0.2
