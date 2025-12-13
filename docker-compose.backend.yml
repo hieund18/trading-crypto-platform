@@ -33,6 +33,7 @@ services:
       - JWT_SIGNERKEY=${JWT_SIGNERKEY}
       - OUTBOUND_GOOGLE_CLIENTSECRET=${GOOGLE_CLIENT_SECRET}
       - OUTBOUND_GITHUB_CLIENTSECRET=${GITHUB_CLIENT_SECRET}
+      - IDENTITY_REDIRECT_URI=${FRONTEND_URL}/authenticate
     depends_on:
       - wallet-service
       - profile-service

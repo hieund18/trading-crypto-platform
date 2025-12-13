@@ -74,8 +74,21 @@ sudo docker compose up -d
 sudo docker compose down
 )
 
+-- cấu hình trên cloud flare
+DNS record (BẮT BUỘC)
+Cloudflare → DNS:
 
---- cài nginx cho API Gateway
+Type	Name	Value			Proxy
+A	api	SERVER_IP		DNS only (xám)
+A	@	SERVER_IP (frontend)	DNS only
+
+Cloudflare → SSL/TLS:
+Mode: Full (hoặc Full Strict nếu có cert)
+Edge Certificates:
+	Always Use HTTPS: ON
+
+--- NGINX cho API Gateway
+cài NGINX :
 sudo apt update
 sudo apt install -y nginx
 
@@ -84,3 +97,13 @@ sudo nano /etc/nginx/sites-available/api.bitstorm.store
 (xoa: 
 sudo rm -f /etc/nginx/sites-available/api.bitstorm.store
 )
+
+kich hoat:
+sudo ln -s /etc/nginx/sites-available/api.bitstorm.store /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl reload nginx
+
+Cài HTTPS (Let’s Encrypt):
+sudo apt install -y certbot python3-certbot-nginx
+sudo certbot --nginx -d api.bitstorm.store
+

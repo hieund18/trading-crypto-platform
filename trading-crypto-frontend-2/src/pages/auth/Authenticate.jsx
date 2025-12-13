@@ -87,7 +87,7 @@ export default function Authenticate() {
 
         toastSuccess(`Đăng nhập thành công!`);
         if (userInfo?.roles?.some(r => r.name === "ADMIN")) nav("/admin");
-        else nav("/dashboard");
+        else nav("/market");
 
       } else {
         toastError(res.message || "Đăng nhập thất bại");
