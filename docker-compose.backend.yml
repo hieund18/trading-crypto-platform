@@ -68,7 +68,7 @@ services:
       - backend
   
   otp-service:
-    image: hieund18/otp-service:0.0.2
+    image: hieund18/otp-service:0.0.3
     container_name: otp-service
     restart: always
     environment:
@@ -91,7 +91,7 @@ services:
       - backend
   
   notification-service:
-    image: hieund18/notification-service:0.0.2
+    image: hieund18/notification-service:0.0.5
     container_name: notification-service
     restart: always
     environment:

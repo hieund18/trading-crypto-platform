@@ -1,5 +1,7 @@
 package com.hieu.notification_service.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hieu.common.dto.NotificationEvent;
 import com.hieu.notification_service.service.NotificationService;
 import lombok.AccessLevel;
@@ -17,8 +19,9 @@ public class NotificationController {
     NotificationService notificationService;
 
     @KafkaListener(topics = "notification-delivery")
-    public void listenNotificationDelivery(NotificationEvent message) {
-        log.info("Message: {}", message);
+    public void listenNotificationDelivery(NotificationEvent message) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        log.info("RAW KAFKA MESSAGE = {}", mapper.writeValueAsString(message));
 
         notificationService.send(message);
     }

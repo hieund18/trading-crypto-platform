@@ -53,4 +53,4 @@ services:
     build:
       context: .
       dockerfile: notification-service/Dockerfile
-    image: hieund18/notification-service:0.0.2
+    image: hieund18/notification-service:0.0.6

@@ -23,6 +23,7 @@ import com.hieu.otp_service.util.OtpUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class OtpService {
     OtpRepository otpRepository;
     RateLimitRepository rateLimitRepository;
@@ -77,7 +79,16 @@ public class OtpService {
                 .param(param)
                 .build();
 
-        kafkaTemplate.send("notification-delivery", notificationEvent);
+        log.info("Dang chuan bi gui tin nhan Kafka cho email: {}", request.getRecipient());
+
+        kafkaTemplate.send("notification-delivery", notificationEvent).whenComplete((result, ex) -> {
+            if (ex == null) {
+                log.info(
+                        "GUI THANH CONG! Offset: {}", result.getRecordMetadata().offset());
+            } else {
+                log.error("GUI THAT BAI :( Loi chi tiet: ", ex);
+            }
+        });
 
         var response = otpMapper.toOtpResponse(otp);
         response.setOtpTtl(type.getOtpTtl());
