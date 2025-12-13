@@ -78,6 +78,10 @@ services:
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
 
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1         # Quan trọng nhất: Giảm bản sao offsets xuống 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1 # Giảm bản sao log transaction xuống 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+
       KAFKA_HEAP_OPTS: "-Xmx512m -Xms512m"
     volumes:
       - ./data/kafka:/kafka/data

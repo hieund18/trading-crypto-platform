@@ -41,7 +41,7 @@ services:
       - backend
 
   coin-service:
-    image: hieund18/coin-service:0.0.2
+    image: hieund18/coin-service:0.0.3
     container_name: coin-service
     restart: always
     environment:
