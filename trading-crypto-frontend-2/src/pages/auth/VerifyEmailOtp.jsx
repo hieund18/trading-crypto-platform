@@ -86,7 +86,7 @@ export default function VerifyEmailOtp() {
       if (roles.includes("ADMIN")) {
         nav("/admin", { replace: true });
       } else {
-        nav("/dashboard", { replace: true });
+        nav("/markets", { replace: true });
       }
     } catch (err) {
       const backend = err.response?.data;
