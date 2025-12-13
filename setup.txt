@@ -1,5 +1,5 @@
 
-tao thu muc luu du lieu db:
+---tao thu muc luu du lieu db:
 sudo mkdir -p /opt/db/data/{mysql,mongo,redis,kafka}
 (xoa: 
 sudo rm -rf /opt/db/data/mysql
@@ -11,6 +11,10 @@ sudo rm -rf /opt/db/data/kafka
 cap quyen ghi cho kafka:
 sudo chown -R 1000:1000 /opt/db/data/kafka
 sudo chmod -R 775 /opt/db/data/kafka
+
+
+tao mang chung:
+sudo docker network create backend
 
 tao file docker compose tao db:
 sudo nano /opt/db/docker-compose.yml
@@ -25,8 +29,7 @@ sudo docker compose up -d
 sudo docker compose down
 )
 
-
-tao port forwarding de ket noi db voi local (dung termius):
+---tao port forwarding de ket noi db voi local (dung termius):
 mysql:
 Name: mysql
 Type: Local
@@ -42,5 +45,42 @@ redis:
 Local Port: 6379
 Remote Port: 6379
 
+--- build docker
 build cac service backend:
 docker compose -f docker-compose.build.yml build
+
+push lên docker hub
+docker-compose -f docker-compose.build.yml push
+
+tao thư muc luu backend:
+sudo mkdir -p /opt/backend
+
+tao file docker compose tao backend:
+sudo nano /opt/backend/docker-compose.yml
+(xoa: 
+sudo rm -f /opt/backend/docker-compose.yml
+)
+
+tao file .env
+sudo nano /opt/backend/.env
+(xoa: 
+sudo rm -f /opt/backend/.env
+)
+
+chay docker
+cd /opt/backend
+sudo docker compose up -d
+(down: 
+sudo docker compose down
+)
+
+
+--- cài nginx cho API Gateway
+sudo apt update
+sudo apt install -y nginx
+
+tao file cấu hình NGINX cho API Gateway:
+sudo nano /etc/nginx/sites-available/api.bitstorm.store
+(xoa: 
+sudo rm -f /etc/nginx/sites-available/api.bitstorm.store
+)

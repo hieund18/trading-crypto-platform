@@ -4,7 +4,7 @@ import api from "./axiosInstance";
 import { getRefreshToken, setToken, setRefreshToken } from "./tokenUtils";
 
 // Đổi BASE_URL cho khớp với Identity Service
-const BASE_URL = "http://localhost:8888/api/v1/identity";
+const BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/identity`;
 
 // ========== AUTH APIs ==========
 

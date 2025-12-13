@@ -9,40 +9,48 @@ services:
 
   wallet-service:
     build:
-      context: ./wallet-service
+      context: .
+      dockerfile: wallet-service/Dockerfile
     image: hieund18/wallet-service:0.0.2
 
   order-service:
     build:
-      context: ./order-service
+      context: .
+      dockerfile: order-service/Dockerfile
     image: hieund18/order-service:0.0.2
 
   coin-service:
     build:
       context: ./coin-service
-    image: hieund18/coin-service:0.0.2
+      dockerfile: Dockerfile
+    image: hieund18/coin-service:0.0.3
 
   otp-service:
     build:
-      context: ./otp-service
+      context: .
+      dockerfile: otp-service/Dockerfile
     image: hieund18/otp-service:0.0.2
 
   profile-service:
     build:
-      context: ./profile-service
+      context: .
+      dockerfile: profile-service/Dockerfile
     image: hieund18/profile-service:0.0.2
 
   file-service:
     build:
       context: ./file-service
+      dockerfile: Dockerfile
     image: hieund18/file-service:0.0.2
 
   api-gateway:
     build:
-      context: ./api-gateway
+      context: .
+      dockerfile: api-gateway/Dockerfile
     image: hieund18/api-gateway:0.0.2
     
   notification-service:
     build:
-      context: ./notification-service
+      context: .
+      dockerfile: notification-service/Dockerfile
     image: hieund18/notification-service:0.0.2

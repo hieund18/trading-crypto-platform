@@ -1,21 +1,129 @@
-coin-service:
-  image: hieund18/coin-service:latest
-  environment:
-    MONGO_URI: mongodb://root:root@mongodb:27017/coin_service?authSource=admin
-    REDIS_HOST: redis
-    REDIS_PORT: 6379
-    KAFKA_BOOTSTRAP: kafka:9092
-    COINGECKO_API_KEY: xxxxxxxxx
-  depends_on:
-    - mongodb
-    - redis
-    - kafka
+version: "3.8"
 
-file-service:
-  environment:
-  MONGO_URI: mongodb://root:root@mongodb:27017/file_service?authSource=admin
-  DOWNLOAD_PREFIX: https://api.bitstorm.store/api/v1/file/media/download/
-  AWS_ACCESS_KEY: xxx
-  AWS_SECRET_KEY: xxx
-  AWS_REGION: ap-southeast-1
-  AWS_S3_BUCKET: trading.crypto.app
+services:
+  api-gateway:
+    image: hieund18/api-gateway:0.0.2
+    container_name: api-gateway
+    restart: always
+    ports:
+      - "8888:8888"
+    environment:
+      - FRONTEND_URL=${FRONTEND_URL}
+    depends_on:
+      - identity-service
+      - profile-service
+      - file-service
+      - coin-service
+      - wallet-service
+      - order-service
+    networks:
+      - backend
+
+  identity-service:
+    image: hieund18/identity-service:0.0.2
+    container_name: identity-service
+    restart: always
+    environment:
+      - DBMS_CONNECTION=jdbc:mysql://mysql:3306/identity_service
+      - DBMS_USERNAME=root
+      - DBMS_PASSWORD=root
+      - OTP_SERVICE_URL=http://otp-service:8081/otp
+      - PROFILE_SERVICE_URL=http://profile-service:8083/profile
+      - WALLET_SERVICE_URL=http://wallet-service:8086/wallet
+      - JWT_SIGNERKEY=${JWT_SIGNERKEY}
+      - OUTBOUND_GOOGLE_CLIENTSECRET=${GOOGLE_CLIENT_SECRET}
+      - OUTBOUND_GITHUB_CLIENTSECRET=${GITHUB_CLIENT_SECRET}
+    depends_on:
+      - wallet-service
+      - profile-service
+    networks:
+      - backend
+
+  coin-service:
+    image: hieund18/coin-service:0.0.2
+    container_name: coin-service
+    restart: always
+    environment:
+      MONGO_URI: mongodb://root:root@mongodb:27017/coin_service?authSource=admin
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      KAFKA_BOOTSTRAP: kafka:9092
+      COINGECKO_API_KEY: ${COINGECKO_API_KEY}
+    networks:
+      - backend
+
+  file-service:
+    image: hieund18/file-service:0.0.2
+    container_name: file-service
+    restart: always
+    environment:
+      MONGO_URI: mongodb://root:root@mongodb:27017/file_service?authSource=admin
+      DOWNLOAD_PREFIX: ${SERVER_IP_OR_DOMAIN}/api/v1/file/media/download/
+      AWS_ACCESS_KEY: ${AWS_ACCESS_KEY}
+      AWS_SECRET_KEY: ${AWS_SECRET_KEY}
+      AWS_REGION: ${AWS_REGION}
+      AWS_S3_BUCKET: ${AWS_S3_BUCKET}
+    networks:
+      - backend
+  
+  otp-service:
+    image: hieund18/otp-service:0.0.2
+    container_name: otp-service
+    restart: always
+    environment:
+      - MONGO_URI=mongodb://root:root@mongodb:27017/otp_service?authSource=admin
+      - KAFKA_BOOTSTRAP=kafka:9092
+    networks:
+      - backend
+
+  order-service:
+    image: hieund18/order-service:0.0.2
+    container_name: order-service
+    restart: always
+    environment:
+      DBMS_CONNECTION: jdbc:mysql://mysql:3306/order_service
+      DBMS_USERNAME: root
+      DBMS_PASSWORD: root
+      COIN_SERVICE_URL: http://coin-service:8085/coin
+      WALLET_SERVICE_URL: http://wallet-service:8086/wallet
+    networks:
+      - backend
+  
+  notification-service:
+    image: hieund18/notification-service:0.0.2
+    container_name: notification-service
+    restart: always
+    environment:
+      - MONGO_URI=mongodb://root:root@mongodb:27017/notification_service?authSource=admin
+      - KAFKA_BOOTSTRAP=kafka:9092
+      - OUTBOUND_SENDGRID_APIKEY=${SENDGRID_API_KEY}
+    networks:
+      - backend
+
+  profile-service:
+    image: hieund18/profile-service:0.0.2
+    container_name: profile-service
+    restart: always
+    environment:
+      MONGO_URI: mongodb://root:root@mongodb:27017/profile_service?authSource=admin
+      FILE_SERVICE_URL: http://file-service:8084/file
+    networks:
+      - backend
+  
+  wallet-service:
+    image: hieund18/wallet-service:0.0.2
+    container_name: wallet-service
+    restart: always
+    environment:
+      DBMS_CONNECTION: jdbc:mysql://mysql:3306/wallet_service
+      DBMS_USERNAME: root
+      DBMS_PASSWORD: root
+      OTP_SERVICE_URL: http://otp-service:8081/otp
+      IDENTITY_SERVICE_URL: http://identity-service:8080/identity
+    networks:
+      - backend
+
+networks:
+  backend:
+    external: true
+

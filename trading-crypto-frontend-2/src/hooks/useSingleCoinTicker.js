@@ -3,7 +3,7 @@ import { useEffect, useState, useRef } from "react";
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 
-const SOCKET_URL = "http://localhost:8888/api/v1/coin/ws";
+const SOCKET_URL = import.meta.env.VITE_WS_URL;
 
 export const useSingleCoinTicker = (initialCoin) => {
   const [coin, setCoin] = useState(initialCoin);

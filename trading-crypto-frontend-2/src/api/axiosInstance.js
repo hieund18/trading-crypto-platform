@@ -4,7 +4,7 @@ import { refreshAccessToken } from "./authApi";
 import { getToken, setToken, clearAuth } from "./tokenUtils";
 
 const api = axios.create({
-  baseURL: "http://localhost:8888/api/v1", // 🚀 đổi về domain Auth Service
+  baseURL: import.meta.env.VITE_API_BASE_URL, // 🚀 đổi về domain Auth Service
   withCredentials: false,
 });
 

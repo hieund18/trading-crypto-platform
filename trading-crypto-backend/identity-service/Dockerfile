@@ -2,21 +2,24 @@
 # STAGE 1: BUILD
 # ============================
 FROM maven:3.9.8-amazoncorretto-21 AS build
-
 WORKDIR /app
 
-# Copy toàn bộ source code vào Docker
-COPY . .
+# 1. Copy và cài đặt thư viện common (Bắt buộc để các service khác dùng được)
+COPY common/pom.xml common/pom.xml
+COPY common/src common/src
+RUN mvn -f common/pom.xml clean install -DskipTests
 
-# Build module identity-service + tự build common trước (-am)
-RUN mvn -pl identity-service -am clean package -DskipTests
+# 2. Copy và build service chính (Ví dụ: identity-service)
+# LƯU Ý: Thay 'identity-service' bằng tên thư mục của service bạn đang sửa (vd: wallet-service)
+COPY identity-service/pom.xml identity-service/pom.xml
+COPY identity-service/src identity-service/src
 
-
+# Build service
+RUN mvn -f identity-service/pom.xml clean package -DskipTests
 # ============================
 # STAGE 2: RUNTIME
 # ============================
 FROM amazoncorretto:21-alpine
-
 WORKDIR /app
 
 # COPY đúng đường dẫn JAR vào runtime

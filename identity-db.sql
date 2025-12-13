@@ -1,5 +1,5 @@
-CREATE DATABASE identity_service1;
-USE identity_service1;
+CREATE DATABASE identity_service;
+USE identity_service;
 
 CREATE TABLE users(
 	id VARCHAR(50) PRIMARY KEY,

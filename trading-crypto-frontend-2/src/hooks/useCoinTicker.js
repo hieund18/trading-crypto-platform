@@ -5,7 +5,7 @@ import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 
 // Cấu hình URL Socket
-const SOCKET_URL = "http://localhost:8888/api/v1/coin/ws"; 
+const SOCKET_URL = import.meta.env.VITE_WS_URL; 
 
 export const useCoinTicker = (initialCoins) => {
   const [coins, setCoins] = useState(initialCoins);
