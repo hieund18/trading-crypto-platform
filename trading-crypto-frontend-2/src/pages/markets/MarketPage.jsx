@@ -39,6 +39,7 @@ import PercentChange from "../../components/common/PercentChange";
 import { addToWatchlistApi, removeFromWatchlistApi, getMyWatchlistApi } from "../../api/coinApi";
 import { useToast } from "../../utils/toast";
 import { useAuth } from "../../context/AuthContext";
+import { useDocumentTitle } from "../../hooks/useDocumentTitle";
 
 // XÓA: const COLOR_UP...
 // XÓA: const COLOR_DOWN...
@@ -78,6 +79,8 @@ const linkStyle = {
 };
 
 export default function MarketPage() {
+  useDocumentTitle("Thị trường Crypto");
+
   const [searchParams, setSearchParams] = useSearchParams();
   const page = parseInt(searchParams.get("page") || "1");
   const tab = parseInt(searchParams.get("tab") || "0");

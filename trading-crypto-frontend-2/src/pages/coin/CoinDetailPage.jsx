@@ -22,12 +22,20 @@ import { useSingleCoinTicker } from "../../hooks/useSingleCoinTicker";
 // 1. IMPORT CÁC UTILS/COMPONENTS DÙNG CHUNG
 import { formatPrice } from "../../utils/formatters";
 import PercentChange from "../../components/common/PercentChange";
+import { useDocumentTitle } from "../../hooks/useDocumentTitle";
 
 export default function CoinDetailPage() {
   const { id } = useParams();
   const [initialCoin, setInitialCoin] = useState(null);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
+
+  const coinTitle = initialCoin 
+    ? `${initialCoin.name} (${initialCoin.symbol?.toUpperCase()}) | Bitstorm` 
+    : "Chi tiết Coin";
+
+  // 2. Gọi Hook với title động
+  useDocumentTitle(coinTitle);
 
   useEffect(() => {
     const fetchCoin = async () => {
