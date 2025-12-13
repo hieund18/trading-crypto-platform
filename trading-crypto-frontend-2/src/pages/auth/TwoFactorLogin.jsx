@@ -90,7 +90,7 @@ export default function TwoFactorLogin() {
         nav("/admin");
       } else {
         toastSuccess("Đăng nhập thành công!");
-        nav("/dashboard");
+        nav("/markets");
       }
     } catch (err) {
       if (!err.response) {
