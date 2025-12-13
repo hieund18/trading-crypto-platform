@@ -31,7 +31,7 @@ export default function CoinDetailPage() {
   const [errorMsg, setErrorMsg] = useState("");
 
   const coinTitle = initialCoin 
-    ? `${initialCoin.name} (${initialCoin.symbol?.toUpperCase()}) | Bitstorm` 
+    ? `${initialCoin.name} (${initialCoin.symbol?.toUpperCase()})` 
     : "Chi tiết Coin";
 
   // 2. Gọi Hook với title động
