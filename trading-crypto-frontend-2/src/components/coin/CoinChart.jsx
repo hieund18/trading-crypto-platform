@@ -158,6 +158,20 @@ export default function CoinChart({ coinId }) {
       tickAmount: 10,
       tooltip: { enabled: true },
       opposite: true, 
+
+      // 🔥 FIX: Thêm khoảng đệm (padding) để biểu đồ không bị zoom quá sát
+      // Nếu giá trị min/max quá gần nhau (stablecoin), code này sẽ nới rộng khung nhìn ra
+      min: (min) => {
+        if (!min) return 0;
+        // Giảm đáy xuống 0.1% giá trị hiện tại để tạo khoảng trống bên dưới
+        return min - (min * 0.001); 
+      },
+      max: (max) => {
+        if (!max) return 0;
+        // Tăng đỉnh lên 0.1% giá trị hiện tại để tạo khoảng trống bên trên
+        return max + (max * 0.001);
+      },
+      
       labels: {
         align: 'left',
         style: { colors: isDark ? '#848E9C' : '#5E6673', fontSize: '11px', fontFamily: 'Inter, sans-serif' },
